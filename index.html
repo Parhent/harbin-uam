@@ -3,273 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>哈尔滨UAM - 至尊版</title>
+<title>哈尔滨战术地图</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{font-family:'Microsoft YaHei',sans-serif;background:#020204;color:#fff;user-select:none}
-.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#010102 0%,#030308 50%,#050510)}
-.h{flex-direction:row;justify-content:space-between;align-items:center;display:flex;padding:6px 12px;background:linear-gradient(90deg,#080810,#040408);border-bottom:1px solid #00d4ff;box-shadow:0 2px 15px rgba(0,212,255,0.3)}
-.l{font-size:14px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#00ff88,#ff6b00,#a371f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.s{display:flex;align-items:center;gap:4px}
-.o{width:6px;height:6px;background:#00ff88;border-radius:50%;box-shadow:0 0 10px #00ff88;animation:pulse 1s infinite}
+html,body{height:100%;overflow:hidden;touch-action:none}
+body{font-family:'Microsoft YaHei',sans-serif;background:#0a0f14;color:#fff;user-select:none}
+.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#050810 0%,#0a0f14 50%,#0d1520)}
+.h{flex-direction:row;justify-content:space-between;align-items:center;display:flex;padding:8px 16px;background:linear-gradient(90deg,#1a1a2e,#0d1117);border-bottom:2px solid #ff6b00;box-shadow:0 2px 20px rgba(255,107,0,0.3)}
+.l{font-size:16px;font-weight:bold;background:linear-gradient(90deg,#ff6b00,#ffcc00,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s{display:flex;align-items:center;gap:6px}
+.o{width:8px;height:8px;background:#00ff88;border-radius:50%;box-shadow:0 0 10px #00ff88;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-.t{font-family:monospace;color:#00d4ff;font-size:10px}
-.m{flex:1;position:relative;background:#010102;overflow:auto}
+.t{font-family:monospace;color:#ff6b00;font-size:12px}
+.m{flex:1;position:relative;background:#050810;overflow:auto;display:flex;align-items:center;justify-content:center}
+
+/* 战术地图容器 */
+.map-container{position:relative;width:500px;height:500px;max-width:95vw;max-height:70vh}
+
+/* 地图背景 */
+.map-bg{position:absolute;inset:10px;background:linear-gradient(180deg,#0a1520,#0d1a28);border-radius:8px;overflow:hidden}
 
 /* 网格 */
-.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#00d4ff 0.3px,transparent 0.3px),radial-gradient(circle,#ff6b00 0.15px,transparent 0.15px);background-size:20px 20px,40px 40px;opacity:0.12,0.06}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,0.1) 1px,transparent 1px);background-size:25px 25px}
 
 /* 街道 */
-.street{position:absolute;background:rgba(255,255,255,0.04)}
-.street-h{height:4px}
-.street-v{width:4px}
-.main-street{height:6px;background:rgba(255,255,255,0.08)}
-.main-street-v{width:6px}
+.street{position:absolute;background:rgba(255,255,255,0.05)}
+.street-h{height:3px}
+.street-v{width:3px}
+.main-st{height:5px;background:rgba(255,255,255,0.1)}
+.main-st-v{width:5px}
 
-/* 河流 */
-.river{position:absolute;background:linear-gradient(180deg,rgba(0,60,150,0.2),rgba(0,100,200,0.35));border-radius:20px;box-shadow:0 0 25px rgba(0,80,180,0.25)}
-
-/* 公园 */
-.park{position:absolute;background:rgba(0,150,70,0.06);border-radius:8px;border:1px solid rgba(0,200,100,0.12)}
+/* 地形区域 */
+.zone{position:absolute;border-radius:50%;opacity:0.3}
+.zone-safe{background:rgba(0,255,136,0.15);border:2px solid rgba(0,255,136,0.5)}
+.zone-danger{background:rgba(255,0,0,0.1);border:2px dashed rgba(255,0,0,0.5)}
+.zone-drop{background:rgba(255,107,0,0.2);border:2px solid #ff6b00}
 
 /* 建筑 */
-.building{position:absolute;border-radius:2px;opacity:0.9}
+.building{position:absolute;border-radius:2px;opacity:0.8}
+.b-orange{background:linear-gradient(180deg,#ff6b00,#cc5500)}
+.b-yellow{background:linear-gradient(180deg,#ffcc00,#cc9900)}
+.b-green{background:linear-gradient(180deg,#22c55e,#15803d)}
+.b-blue{background:linear-gradient(180deg,#00d4ff,#0066aa)}
+.b-purple{background:linear-gradient(180deg,#a371f7,#7c3aed)}
+.b-pink{background:linear-gradient(180deg,#ec4899,#be185d)}
 
-/* 路径 */
-.path{position:absolute;stroke:#00d4ff;stroke-width:1;stroke-dasharray:6 3;fill:none;opacity:0.35}
+/* 地标 */
+.landmark{position:absolute;width:20px;height:20px;background:rgba(255,107,0,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid #fff;box-shadow:0 0 15px rgba(255,107,0,0.8)}
+.landmark::after{content:'';position:absolute;width:30px;height:30px;border:1px solid rgba(255,107,0,0.5);border-radius:50%;animation:ping 2s infinite}
+@keyframes ping{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
+
+/* 河流 */
+.river{position:absolute;background:linear-gradient(90deg,rgba(0,100,200,0.3),rgba(0,150,255,0.5));border-radius:15px;transform:rotate(-10deg)}
+
+/* 公园 */
+.park{position:absolute;background:rgba(0,200,100,0.1);border-radius:8px;border:1px solid rgba(0,255,136,0.3)}
+
+/* 航线 */
+.flight-path{position:absolute;stroke:#ffcc00;stroke-width:2;stroke-dasharray:8 4;fill:none;opacity:0.7}
 
 /* 飞机 */
-.uav{position:absolute;width:20px;height:20px;border-radius:50%;border:1px solid #fff;display:flex;align-items:center;justify-content:center;font-size:8px;z-index:100;transition:left 0.15s,top 0.15s}
-.uav-id{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:6px;background:rgba(0,0,0,0.8);padding:1px 3px;border-radius:2px}
+.uav{position:absolute;width:16px;height:16px;background:linear-gradient(135deg,#00ff88,#00d4ff);border-radius:50%;border:1.5px solid #fff;z-index:100;box-shadow:0 0 15px rgba(0,255,136,0.8)}
+.uav-dot{width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
 
-/* 起点终点 */
-.sp{position:absolute;width:24px;height:24px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:50}
-.sp1{background:linear-gradient(135deg,#00d4ff,#4f46e5)}
-.sp2{background:linear-gradient(135deg,#ea580c,#dc2626)}
+/* 玩家位置 */
+.player{position:absolute;width:24px;height:24px;background:rgba(255,0,0,0.8);border:2px solid #fff;border-radius:50%;z-index:200;box-shadow:0 0 20px rgba(255,0,0,0.8)}
+.player::before{content:'';position:absolute;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #fff;top:-12px;left:50%;transform:translateX(-50%)}
+.player-dir{position:absolute;width:2px;height:12px;background:#fff;top:-14px;left:50%;transform:translateX(-50%)}
 
-/* 标签 */
-.lb{position:absolute;padding:3px 6px;background:rgba(0,0,0,0.75);border-radius:3px;font-size:8px;border:0.5px solid #00d4ff}
+/* 罗盘 */
+.compass{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:100px;height:30px;display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:bold;color:#ffcc00}
+.compass span{text-shadow:0 0 5px rgba(255,204,0,0.8)}
 
-/* 面板 */
-.panel{position:absolute;background:rgba(5,8,16,0.95);border:0.5px solid #00d4ff;border-radius:8px;padding:8px}
-.i{top:6px;right:6px;width:100px}
-.ti{font-size:10px;font-weight:bold;margin-bottom:6px;padding-bottom:3px;border-bottom:0.5px solid rgba(0,212,255,0.3);color:#00d4ff}
-.r{display:flex;justify-content:space-between;margin-bottom:4px;font-size:8px}
-.r .l{color:#5a8a9e}
-.r .v{color:#00ff88;font-weight:bold}
+/* 坐标标签 */
+.coord{position:absolute;font-size:8px;color:rgba(255,255,255,0.4);font-family:monospace}
 
-.dv{bottom:6px;right:6px;width:140px}
-.ro{display:flex;align-items:center;gap:4px;padding:4px;background:rgba(0,212,255,0.06);border-radius:4px;font-size:8px;margin-bottom:4px}
-.btns{display:flex;gap:4px}
-.btn{padding:5px 8px;border:none;border-radius:4px;font-size:8px;cursor:pointer;flex:1;font-weight:bold}
-.btn:disabled{opacity:0.5}
-.btn1{background:linear-gradient(135deg,#00ff88,#00d4ff);color:#000}
-.btn2{background:rgba(139,92,246,0.2);color:#a78bfa;border:0.5px solid #8b5cf6}
-.btn3{background:rgba(255,107,0,0.1);color:#ff6b00;border:0.5px solid #ff6b00}
-
-.lg{bottom:6px;left:6px;width:80px}
-.lg div{font-size:8px;color:#5a8a9e;margin-bottom:2px}
-.lg item{display:flex;align-items:center;gap:4px;font-size:7px;margin-bottom:1px}
-.cb{width:8px;height:8px;border-radius:1px}
-
-.f{flex-direction:row;justify-content:space-around;display:flex;padding:6px 12px;background:linear-gradient(90deg,#080810,#040408);border-top:1px solid #00d4ff}
-.fi{display:flex;gap:4px;font-size:8px}
-.fi .l{color:#5a8a9e}
+/* 底部信息 */
+.f{justify-content:space-around;display:flex;padding:8px 16px;background:linear-gradient(90deg,#1a1a2e,#0d1117);border-top:2px solid #ff6b00}
+.fi{display:flex;gap:6px;font-size:11px}
+.fi .l{color:#ff6b00}
 .fi .v{color:#00ff88}
 
-/* 统计 */
-.stats{position:absolute;top:6px;left:50%;transform:translateX(-50%);background:rgba(5,8,16,0.95);border:0.5px solid #00d4ff;border-radius:6px;padding:4px 8px;display:flex;gap:10px}
-.stat{text-align:center}
-.stat-n{font-size:12px;font-weight:bold;color:#00ff88}
-.stat-l{font-size:6px;color:#5a8a9e}
+/* 缩放按钮 */
+.zoom{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;gap:5px}
+.zoom button{width:36px;height:36px;background:rgba(255,107,0,0.2);border:1px solid #ff6b00;border-radius:8px;color:#ff6b00;font-size:18px;cursor:pointer}
+.zoom button:active{background:rgba(255,107,0,0.4)}
 
-/* 雷达 */
-.radar{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:50px;height:50px;border:1px solid rgba(0,212,255,0.2);border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.03),transparent)}
-.radar::after{content:'';position:absolute;top:50%;left:50%;width:25px;height:1px;background:linear-gradient(90deg,transparent,#00d4ff);animation:scan 2s linear infinite;transform-origin:left center}
-@keyframes scan{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+/* 图例 */
+.legend{position:absolute;bottom:10px;left:10px;background:rgba(10,15,20,0.9);border:1px solid #ff6b00;border-radius:8px;padding:8px;font-size:9px}
+.legend-item{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.legend-dot{width:8px;height:8px;border-radius:50%}
 
-/* 进度条 */
-.progress-bar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:100px;height:4px;background:rgba(0,212,255,0.2);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#00ff88,#00d4ff);width:0%;transition:width 0.3s}
+/* 统计面板 */
+.stats{position:absolute;top:10px;right:10px;background:rgba(10,15,20,0.9);border:1px solid #ff6b00;border-radius:8px;padding:10px;min-width:120px}
+.stats-title{font-size:11px;color:#ff6b00;font-weight:bold;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,107,0,0.3)}
+.stats-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px}
+.stats-row .l{color:#888}
+.stats-row .v{color:#00ff88;font-weight:bold}
+
+/* 方向指示器 */
+.dir-indicator{position:absolute;top:50%;left:50%;width:300px;height:300px;pointer-events:none;border:1px dashed rgba(255,255,255,0.1);border-radius:50%;transform:translate(-50%,-50%)}
 </style>
 </head>
 <body>
 <div class=c>
-<div class=h><div class=l>🚁 哈尔滨UAM 至尊版</div><div class=s><div class=o></div><span style=color:#00ff88;font-size:8px>在线</span></div><div class=t id=T>00:00:00</div></div>
+<div class=h><div class=l>🎮 哈尔滨战术地图</div><div class=s><div class=o></div><span style=color:#00ff88;font-size:10px>在线</span></div><div class=t id=T>00:00</div></div>
 <div class=m id=map>
+<div class=map-container>
+<!-- 罗盘 -->
+<div class=compass><span style=margin-left:0>W</span><span style=margin-left:25px>N</span><span style=margin-left:25px>E</span><span style=margin-left:25px>S</span></div>
+
+<div class=map-bg>
 <div class=grid></div>
 
 <!-- 街道 -->
-<script>
-const streets = [12,25,38,50,62,75,88];
-streets.forEach(p=>{document.write('<div class="street main-street" style="top:'+p+'%"></div><div class="street main-street-v" style="left:'+p+'%"></div>')});
-[5,18,32,45,58,70,82,95].forEach(p=>{document.write('<div class="street" style="top:'+p+'%;height:1px"></div>')});
-[8,22,35,48,62,75,92].forEach(p=>{document.write('<div class="street" style="left:'+p+'%;width:1px;height:100%"></div>')});
-</script>
+<div class="street main-st" style="top:20%;left:5%;width:90%"></div>
+<div class="street main-st" style="top:40%;left:5%;width:90%"></div>
+<div class="street main-st" style="top:60%;left:5%;width:90%"></div>
+<div class="street main-st" style="top:80%;left:5%;width:90%"></div>
+<div class="street main-st-v" style="left:20%;top:5%;height:90%"></div>
+<div class="street main-st-v" style="left:40%;top:5%;height:90%"></div>
+<div class="street main-st-v" style="left:60%;top:5%;height:90%"></div>
+<div class="street main-st-v" style="left:80%;top:5%;height:90%"></div>
+<div class="street" style="top:10%;height:1px;left:5%;width:90%"></div>
+<div class="street" style="top:30%;height:1px;left:5%;width:90%"></div>
+<div class="street" style="top:50%;height:1px;left:5%;width:90%"></div>
+<div class="street" style="top:70%;height:1px;left:5%;width:90%"></div>
+<div class="street" style="top:90%;height:1px;left:5%;width:90%"></div>
+<div class="street" style="left:10%;width:1px;top:5%;height:90%"></div>
+<div class="street" style="left:30%;width:1px;top:5%;height:90%"></div>
+<div class="street" style="left:50%;width:1px;top:5%;height:90%"></div>
+<div class="street" style="left:70%;width:1px;top:5%;height:90%"></div>
+<div class="street" style="left:90%;width:1px;top:5%;height:90%"></div>
+
+<!-- 安全区 -->
+<div class="zone zone-safe" style="left:30%;top:25%;width:40%;height:50%"></div>
+<div class="zone zone-danger" style="left:5%;top:5%;width:25%;height:30%"></div>
+<div class="zone zone-drop" style="left:60%;top:50%;width:20%;height:25%"></div>
 
 <!-- 河流 -->
 <div class=river style="left:15%;top:15%;width:20%;height:35%"></div>
-<div class=river style="left:55%;top:50%;width:12%;height:20%"></div>
+<div class=river style="left:55%;top:55%;width:15%;height:20%"></div>
 
 <!-- 公园 -->
-<div class=park style="left:1%;top:3%;width:6%;height:5%"></div>
-<div class=park style="left:40%;top:40%;width:8%;height:6%"></div>
-<div class=park style="left:65%;top:60%;width:6%;height:8%"></div>
-<div class=park style="left:10%;top:45%;width:5%;height:5%"></div>
-<div class=park style="left:72%;top:10%;width:5%;height:6%"></div>
-<div class=park style="left:30%;top:70%;width:6%;height:6%"></div>
+<div class=park style="left:5%;top:65%;width:10%;height:10%"></div>
+<div class=park style="left:70%;top:10%;width:10%;height:12%"></div>
+<div class=park style="left:35%;top:70%;width:12%;height:10%"></div>
 
-<!-- 大量彩色建筑 -->
-<script>
-const bColors = ['#ff6b00','#8b5cf6','#00d4ff','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444','#06b6d4','#a855f7','#f97316','#10b981','#f43f5e','#0ea5e9','#d946ef','#f97316','#84cc16'];
-for(let i=0;i<120;i++){
-    const c = bColors[i%bColors.length];
-    document.write('<div class="building" style="left:'+(1+Math.random()*94)+'%;top:'+(3+Math.random()*90)+'%;width:'+(5+Math.random()*18)+'px;height:'+(15+Math.random()*70)+'px;background:linear-gradient(180deg,'+c+','+bColors[(i+5)%bColors.length]+')"></div>');
-}
-</script>
+<!-- 彩色建筑群 -->
+<div class="building b-orange" style="left:8%;top:25%;width:15px;height:35px"></div>
+<div class="building b-yellow" style="left:15%;top:35%;width:12px;height:40px"></div>
+<div class="building b-blue" style="left:25%;top:15%;width:18px;height:50px"></div>
+<div class="building b-green" style="left:35%;top:25%;width:14px;height:45px"></div>
+<div class="building b-purple" style="left:45%;top:10%;width:16px;height:55px"></div>
+<div class="building b-pink" style="left:55%;top:20%;width:15px;height:48px"></div>
+<div class="building b-orange" style="left:65%;top:30%;width:14px;height:42px"></div>
+<div class="building b-yellow" style="left:75%;top:15%;width:17px;height:50px"></div>
+<div class="building b-blue" style="left:85%;top:25%;width:12px;height:38px"></div>
+
+<div class="building b-green" style="left:10%;top:55%;width:13px;height:35px"></div>
+<div class="building b-purple" style="left:20%;top:65%;width:15px;height:40px"></div>
+<div class="building b-pink" style="left:30%;top:50%;width:12px;height:35px"></div>
+<div class="building b-orange" style="left:40%;top:60%;width:16px;height:45px"></div>
+<div class="building b-yellow" style="left:50%;top:55%;width:14px;height:38px"></div>
+<div class="building b-blue" style="left:60%;top:65%;width:13px;height:42px"></div>
+<div class="building b-green" style="left:70%;top:50%;width:15px;height:35px"></div>
+<div class="building b-purple" style="left:80%;top:60%;width:12px;height:40px"></div>
+
+<div class="building b-pink" style="left:5%;top:80%;width:10px;height:25px"></div>
+<div class="building b-orange" style="left:20%;top:85%;width:12px;height:28px"></div>
+<div class="building b-yellow" style="left:35%;top:80%;width:14px;height:30px"></div>
+<div class="building b-blue" style="left:50%;top:85%;width:11px;height:25px"></div>
+<div class="building b-green" style="left:65%;top:82%;width:13px;height:28px"></div>
+<div class="building b-purple" style="left:80%;top:78%;width:12px;height:30px"></div>
+
+<!-- 地标 -->
+<div class=landmark style="left:25%;top:30%">📍</div>
+<div class=landmark style="left:45%;top:20%">🏢</div>
+<div class=landmark style="left:70%;top:40%">🏙️</div>
+<div class=landmark style="left:35%;top:60%">🏟️</div>
+<div class=landmark style="left:60%;top:70%">🎭</div>
+<div class=landmark style="left:15%;top:75%">🏁</div>
 
 <!-- 航线 -->
-<svg class=path style="top:30%;left:3%;width:94%;height:45%" viewBox="0 0 100 100"><path d="M 2 75 Q 15 55 35 58 Q 55 62 98 20"/></svg>
+<svg class=flight-path style="top:25%;left:5%;width:90%;height:50%" viewBox="0 0 100 100"><path d="M 5 80 Q 30 60 50 55 Q 70 50 95 25"/></svg>
 
-<!-- 起点终点 -->
-<div class="sp sp1" style="left:2%;top:68%">🏁</div>
-<div class="sp sp2" style="left:95%;top:15%">🎭</div>
+<!-- 坐标标签 -->
+<div class=coord style="left:5%;top:5%">0,0</div>
+<div class=coord style="right:5%;top:5%">100,0</div>
+<div class=coord style="left:5%;bottom:5%">0,100</div>
+<div class=coord style="right:5%;bottom:5%">100,100</div>
 
-<!-- 标签 -->
-<div class=lb style="left:0%;top:72%">防洪纪念塔</div>
-<div class=lb style="left:90%;top:8%">大剧院</div>
+<!-- 玩家位置 -->
+<div class=player style="left:50%;top:50%"><div class=player-dir></div></div>
 
-<!-- 飞机容器 -->
+<!-- 方向指示器 -->
+<div class=dir-indicator></div>
+
+<!-- 动态飞机 -->
 <div id=planes-container></div>
+</div>
+
+<!-- 图例 -->
+<div class=legend>
+<div class=legend-item><span class=legend-dot style=background:rgba(0,255,136,0.5)></span><span>安全区</span></div>
+<div class=legend-item><span class=legend-dot style=background:rgba(255,0,0,0.5)></span><span>危险区</span></div>
+<div class=legend-item><span class=legend-dot style=background:#ff6b00></span><span>空投区</span></div>
+<div class=legend-item><span class=legend-dot style=background:#00ff88></span><span>玩家</span></div>
+</div>
 
 <!-- 统计 -->
 <div class=stats>
-<div class=stat><div class=stat-n id=c1>0</div><div class=stat-l>飞行器</div></div>
-<div class=stat><div class=stat-n id=c2>0</div><div class=stat-l>平均高度</div></div>
-<div class=stat><div class=stat-n id=c3>0</div><div class=stat-l>km/h</div></div>
+<div class=stats-title>📡 飞行状态</div>
+<div class=stats-row><span class=l>飞行器:</span><span class=v id=ac>0</span></div>
+<div class=stats-row><span class=l>高度:</span><span class=v id=aa>0m</span></div>
+<div class=stats-row><span class=l>速度:</span><span class=v id=as>0km/h</span></div>
+<div class=stats-row><span class=l>坐标:</span><span class=v id=coord>50,50</span></div>
 </div>
 
-<!-- 雷达 -->
-<div class=radar></div>
-
-<!-- 进度条 -->
-<div class=progress-bar><div class=progress-fill id=prog></div></div>
-
-<!-- 面板 -->
-<div class="panel i">
-<div class=ti>✈️</div>
-<div class=r><span class=l>飞行器:</span><span class=v id=ac>0</span></div>
-<div class=r><span class=l>高度:</span><span class=v id=aa>0 m</span></div>
-<div class=r><span class=l>速度:</span><span class=v id=as>0 km/h</span></div>
+<!-- 缩放 -->
+<div class=zoom>
+<button onclick="zoomIn()">+</button>
+<button onclick="zoomOut()">−</button>
 </div>
-
-<div class="panel dv">
-<div class=ro>🏁 哈尔滨UAM系统</div>
-<div class=btns>
-<button class=btn btn1 onclick=startAll()>▶</button>
-<button class=btn btn2 onclick=pauseAll() id=bp>⏸</button>
-<button class=btn btn3 onclick=resetAll()>↺</button>
 </div>
 </div>
 
-<div class="panel lg"><div>高度</div><div item><span class=cb style=background:#00ff88></span><span>低</span></div><div item><span class=cb style=background:#00d4ff></span><span>中</span></div><div item><span class=cb style=background:#a371f7></span><span>高</span></div></div>
-</div>
-
-<div class=f><div class=fi><span class=l>活跃:</span><span class=v id=fa>0</span></div><div class=fi><span class=l>航班:</span><span class=v id=ff>0</span></div></div>
+<div class=f><div class=fi><span class=l>📍:</span><span class=v id=fa>0</span></div><div class=fi><span class=l>🚁:</span><span class=v id=ff>0</span></div><div class=fi><span class=l>📶:</span><span class=v style=color:#00ff88>强</span></div></div>
 </div>
 
 <script>
-// 100架飞机系统
+// 100架飞机
 const PLANE_COUNT = 100;
 const planes = [];
-const colors = ['#00ff88','#00d4ff','#ff6b00','#a371f7','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444','#06b6d4','#a855f7','#10b981','#f43f5e','#0ea5e9','#d946ef'];
+const colors = ['#00ff88','#00d4ff','#ff6b00','#a371f7','#22c55e','#ffcc00','#ec4899','#14b8a6'];
 const container = document.getElementById('planes-container');
 
 for(let i=1;i<=PLANE_COUNT;i++){
     const el = document.createElement('div');
     el.className = 'uav';
-    el.id = 'U'+i;
-    el.innerHTML = '🚁<div class=uav-id></div>';
-    const startX = 1 + Math.random()*10;
-    const startY = 35 + Math.random()*45;
-    const endX = 85 + Math.random()*12;
-    const endY = 10 + Math.random()*35;
-    const baseAlt = 350 + Math.random()*450;
+    el.innerHTML = '<div class=uav-dot></div>';
+    const startX = 5 + Math.random()*15;
+    const startY = 35 + Math.random()*40;
+    const endX = 75 + Math.random()*18;
+    const endY = 20 + Math.random()*30;
     const color = colors[i % colors.length];
-    const speed = 35 + Math.random()*45;
     el.style.background = `linear-gradient(135deg,${color},${color}88)`;
-    el.style.boxShadow = `0 0 15px ${color}99`;
+    el.style.boxShadow = `0 0 15px ${color}`;
     el.style.left = startX+'%';
     el.style.top = startY+'%';
     container.appendChild(el);
     
     planes.push({
         el: el,
-        id: 'E'+(i<10?'0'+i:i),
         start: {x:startX,y:startY},
         end: {x:endX,y:endY},
-        baseAlt: baseAlt,
-        speed: speed,
+        alt: 300 + Math.random()*500,
+        speed: 40 + Math.random()*40,
         progress: Math.random()
     });
 }
 
-let F=false,Pf=false,Ani;
+let F=false,Pf=false,Ani,scale=1;
 function startAll(){
     if(F&&!Pf)return;
     F=true;Pf=false;
-    Ani=setInterval(update,40);
+    Ani=setInterval(update,50);
 }
-function pauseAll(){
-    if(!F)return;
-    Pf=!Pf;
-    document.getElementById('bp').textContent = Pf?'▶':'⏸';
-}
+function pauseAll(){Pf=!Pf;document.getElementById('bp').textContent=Pf?'▶':'⏸'}
 function resetAll(){
-    F=false;Pf=false;clearInterval(Ani);
-    planes.forEach(p=>{
-        p.progress = Math.random();
-        p.el.style.left = p.start.x+'%';
-        p.el.style.top = p.start.y+'%';
-    });
-    updateUI();
+    F=false;clearInterval(Ani);
+    planes.forEach(p=>{p.progress=Math.random();p.el.style.left=p.start.x+'%';p.el.style.top=p.start.y+'%'});
+    updateStats();
 }
 function update(){
     if(!F||Pf)return;
-    let totalAlt=0,totalSpeed=0;
-    planes.forEach((p,i)=>{
+    let totalAlt=0;
+    planes.forEach(p=>{
         p.progress+=0.001;
         if(p.progress>1)p.progress=0;
-        const x = p.start.x + (p.end.x-p.start.x)*p.progress;
-        const y = p.start.y + (p.end.y-p.start.y)*p.progress + Math.sin(p.progress*Math.PI)*10;
-        p.el.style.left = x+'%';
-        p.el.style.top = y+'%';
-        const h = Math.round(p.baseAlt + Math.sin(p.progress*Math.PI)*200);
-        p.el.querySelector('.uav-id').textContent = h+'m';
+        const x=p.start.x+(p.end.x-p.start.x)*p.progress;
+        const y=p.start.y+(p.end.y-p.start.y)*p.progress+Math.sin(p.progress*Math.PI)*8;
+        p.el.style.left=x+'%';
+        p.el.style.top=y+'%';
+        const h=Math.round(p.alt+Math.sin(p.progress*Math.PI)*200);
         totalAlt+=h;
-        totalSpeed+=p.speed;
     });
-    const avgAlt = Math.round(totalAlt/PLANE_COUNT);
-    const avgSpeed = Math.round(totalSpeed/PLANE_COUNT);
-    document.getElementById('c1').textContent = PLANE_COUNT;
-    document.getElementById('c2').textContent = avgAlt;
-    document.getElementById('c3').textContent = avgSpeed;
-    document.getElementById('ac').textContent = PLANE_COUNT;
-    document.getElementById('aa').textContent = avgAlt+' m';
-    document.getElementById('as').textContent = avgSpeed+' km/h';
-    document.getElementById('fa').textContent = PLANE_COUNT;
-    document.getElementById('ff').textContent = Math.floor(Math.random()*1000)+500;
-    document.getElementById('prog').style.width = (avgAlt/1000*100)+'%';
+    const avgAlt=Math.round(totalAlt/PLANE_COUNT);
+    document.getElementById('ac').textContent=PLANE_COUNT;
+    document.getElementById('aa').textContent=avgAlt+'m';
+    document.getElementById('as').textContent=Math.round(40+Math.random()*40)+'km/h';
+    document.getElementById('fa').textContent=PLANE_COUNT;
+    document.getElementById('ff').textContent=Math.floor(Math.random()*200)+100;
 }
-function updateUI(){
-    ['c1','c2','c3','ac','aa','as','fa','ff'].forEach(id=>document.getElementById(id).textContent='0');
+function updateStats(){
+    document.getElementById('ac').textContent='0';
+    document.getElementById('aa').textContent='0m';
 }
+function zoomIn(){scale=Math.min(scale+0.2,2);document.querySelector('.map-container').style.transform='scale('+scale+')'}
+function zoomOut(){scale=Math.max(scale-0.2,0.5);document.querySelector('.map-container').style.transform='scale('+scale+')'}
 function T(){
-    const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
-    document.getElementById('T').textContent=h+':'+m+':'+s;
+    const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0');
+    document.getElementById('T').textContent=h+':'+m;
 }
 setInterval(T,1000);T();
+
+// 自动开始
+setTimeout(startAll,500);
 </script>
 </body>
 </html>
