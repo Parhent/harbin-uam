@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哈尔滨UAM - 离线版</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0d1117;color:#fff}
+.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#0d1117 0%,#161b22 100%)}
+.h{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:rgba(22,27,34,.95);border-bottom:1px solid #30363d}
+.l{font-size:22px;font-weight:bold}
+.l span{background:linear-gradient(90deg,#58a6ff,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s{display:flex;align-items:center;gap:8px;font-size:13px;color:#8b949e}
+.o{width:10px;height:10px;border-radius:50%;background:#3fb950;box-shadow:0 0 8px #3fb950}
+.t{font-family:'SF Mono',monospace;color:#58a6ff;font-size:15px}
+.m{flex:1;position:relative;background:#0d1117;overflow:hidden}
+.map{position:absolute;inset:0;background:#0d1117}
+.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#30363d 1px,transparent 1px);background-size:30px 30px;opacity:.5}
+.building{position:absolute;background:linear-gradient(180deg,#21262d 0%,#161b22 100%);border:1px solid #30363d}
+.b1{left:15%;top:20%;width:80px;height:120px;border-radius:4px}
+.b2{left:25%;top:40%;width:60px;height:80px;border-radius:3px}
+.b3{left:45%;top:25%;width:100px;height:150px;border-radius:5px}
+.b4{left:55%;top:50%;width:70px;height:90px;border-radius:4px}
+.b5{left:70%;top:30%;width:90px;height:130px;border-radius:4px}
+.river{position:absolute;left:35%;top:35%;width:25%;height:40%;background:linear-gradient(90deg,rgba(56,139,253,.1),rgba(56,139,253,.2));border-radius:20px;transform:rotate(-15deg)}
+.path{position:absolute;top:45%;left:20%;width:55%;height:35%;stroke:#58a6ff;stroke-width:3;stroke-dasharray:12 6;fill:none;opacity:.7}
+.sp{position:absolute;width:40px;height:40px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px rgba(88,166,255,.6)}
+.sp1{left:20%;top:55%;background:linear-gradient(135deg,#58a6ff,#a371f7)}
+.sp2{left:70%;top:35%;background:linear-gradient(135deg,#f0883e,#f778ba)}
+.uav{position:absolute;top:47%;left:40%;width:50px;height:50px;background:linear-gradient(135deg,#3fb950,#58a6ff);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 25px rgba(63,185,80,.8);transition:left 0.5s,top 0.5s;z-index:10}
+.uav::after{content:'';position:absolute;width:70px;height:70px;border:1px solid rgba(63,185,80,.4);border-radius:50%;animation:rip 2s infinite}
+@keyframes rip{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.3);opacity:0}}
+.lb{position:absolute;padding:4px 10px;background:rgba(0,0,0,.8);border-radius:4px;font-size:11px;white-space:nowrap;border:1px solid #30363d}
+.lb1{left:12%;top:62%}
+.lb2{left:62%;top:42%}
+.i{position:absolute;top:15px;right:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:12px;padding:15px;width:160px;backdrop-filter:blur(10px)}
+.ti{font-size:14px;font-weight:bold;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #30363d}
+.r{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px}
+.r .l{color:#8b949e}
+.r .v{color:#58a6ff;font-family:'SF Mono',monospace}
+.dv{position:absolute;bottom:15px;right:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:12px;padding:12px}
+.ro{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(88,166,255,.05);border-radius:6px;font-size:11px;margin-bottom:10px}
+.btns{display:flex;gap:8px;margin-top:10px}
+.btn{padding:10px 14px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1;font-weight:500}
+.btn:disabled{opacity:.5}
+.btn1{background:linear-gradient(135deg,#238636,#2ea043);color:#fff}
+.btn2{background:rgba(136,46,224,.2);color:#d2a8ff;border:1px solid #8b5cf6}
+.btn3{background:rgba(210,153,34,.2);color:#d29922;border:1px solid #d29922}
+.lg{position:absolute;bottom:15px;left:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:10px;padding:12px}
+.lg div{font-size:11px;color:#8b949e;margin-bottom:6px}
+.lg item{display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:3px}
+.cb{width:12px;height:12px;border-radius:2px}
+.f{display:flex;justify-content:space-around;padding:10px 20px;background:rgba(22,27,34,.95);border-top:1px solid #30363d}
+.fi{display:flex;gap:6px;font-size:11px}
+.fi .l{color:#8b949e}
+.fi .v{color:#58a6ff;font-family:'SF Mono',monospace}
+</style>
+</head>
+<body>
+<div class=c>
+<div class=h><div class=l><span>🚁</span> Harbin UAM</div><div class=s><div class=o></div><span>系统在线</span></div><div class=t id=T>00:00:00</div></div>
+<div class=m>
+<div class=map>
+<div class=grid></div>
+<div class=river></div>
+<div class=building b1></div>
+<div class=building b2></div>
+<div class=building b3></div>
+<div class=building b4></div>
+<div class=building b5></div>
+<svg class=path viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M 15 60 Q 40 45 55 50 Q 70 55 85 35"/></svg>
+<div class=sp sp1>🏁</div><div class=sp sp2>🎭</div>
+<div class=uav id=U>🚁</div>
+<div class=lb lb1>防洪纪念塔</div><div class=lb lb2>哈尔滨大剧院</div>
+</div>
+<div class=i><div class=ti>✈️ 飞行状态</div><div class=r><span class=l>飞行器:</span><span class=v>EVTOL-001</span></div><div class=r><span class=l>高 度:</span><span class=v id=ALT>0 m</span></div><div class=r><span class=l>速 度:</span><span class=v id=SPD>0 km/h</span></div><div class=r><span class=l>余 程:</span><span class=v id=REM>0 km</span></div><div class=r><span class=l>状 态:</span><span class=v id=STA>待起飞</span></div></div>
+<div class=dv><div class=ro><span>🏁</span> 防洪纪念塔 → 哈尔滨大剧院</div><div class=btns><button class=btn btn1 id=B1 onclick=S()>▶ 起飞</button><button class=btn btn2 id=B2 onclick=P() disabled>⏸ 暂停</button><button class=btn btn3 onclick=R()>↺ 重置</button></div></div>
+<div class=lg><div>高度层 (m)</div><div item><span class=cb style=background:#3fb950></span> 低空 0-100</div><div item><span class=cb style=background:#58a6ff></span> 中空 100-300</div><div item><span class=cb style=background:#f0883e></span> 高空 300+</div></div>
+</div>
+<div class=f><div class=fi><span class=l>活跃飞行器:</span><span class=v id=AC>0</span></div><div class=fi><span class=l>今日航班:</span><span class=v id=TF>0</span></div><div class=fi><span class=l>空域状态:</span><span class=v style=color:#3fb950>畅通</span></div></div>
+</div>
+<script>
+let F=false,Pf=false,Pr=0,Ani;
+const C={D:6.5,Sp:80,Mx:200,Mn:50,Dur:12};
+const sp={x:[40,45,50,55,60,65],y:[47,42,38,35,33,35]};
+function S(){if(F&&!Pf)return;if(Pf){Pf=false;document.getElementById('B1').disabled=true;document.getElementById('B2').disabled=false;A();return}F=true;Pf=false;Pr=0;document.getElementById('B1').disabled=true;document.getElementById('B2').disabled=false;A()}
+function A(){if(!F||Pf)return;Pr+=1/C.Dur;if(Pr>=1){Pr=1;FC();return}const i=Math.min(Math.floor(Pr*6),5),t=Pr*6-i,st=sp[i],en=sp[i+1]||st,x=st.x+(en.x-st.x)*t,y=st.y+(en.y-st.y)*t;document.getElementById('U').style.left=x+'%';document.getElementById('U').style.top=y+'%';const h=C.Mn+(C.Mx-C.Mn)*Math.sin(Pr*Math.PI),s=Pr<.1?C.Sp*(Pr/.1):Pr>.9?C.Sp*((1-Pr)/.1):C.Sp,rem=C.D*(1-Pr);document.getElementById('ALT').textContent=Math.round(h)+' m';document.getElementById('SPD').textContent=Math.round(s)+' km/h';document.getElementById('REM').textContent=rem.toFixed(1)+' km';const stt=document.getElementById('STA');if(Pr<.1){stt.textContent='起飞中';stt.style.color='#3fb950'}else if(Pr>.9){stt.textContent='降落中';stt.style.color='#3fb950'}else{stt.textContent='巡航中';stt.style.color='#3fb950'}document.getElementById('AC').textContent='1';document.getElementById('TF').textContent='1';Ani=setTimeout(A,1000)}
+function FC(){F=false;Pr=1;document.getElementById('U').style.left='70%';document.getElementById('U').style.top='35%';document.getElementById('STA').textContent='已到达';document.getElementById('STA').style.color='#3fb950';document.getElementById('ALT').textContent='0 m';document.getElementById('SPD').textContent='0 km/h';document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 重新起飞';document.getElementById('B2').disabled=true}
+function P(){if(!F)return;Pf=true;clearTimeout(Ani);document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 继续';document.getElementById('B2').disabled=true;document.getElementById('STA').textContent='已暂停';document.getElementById('STA').style.color='#f0883e'}
+function R(){F=false;Pf=false;Pr=0;clearTimeout(Ani);document.getElementById('U').style.left='40%';document.getElementById('U').style.top='47%';document.getElementById('ALT').textContent='0 m';document.getElementById('SPD').textContent='0 km/h';document.getElementById('REM').textContent='6.5 km';document.getElementById('STA').textContent='待起飞';document.getElementById('STA').style.color='#8b949e';document.getElementById('AC').textContent='0';document.getElementById('TF').textContent='0';document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 起飞';document.getElementById('B2').disabled=true}
+function T(){const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');document.getElementById('T').textContent=h+':'+m+':'+s}
+setInterval(T,1000);T();
+</script>
+</body>
+</html>
