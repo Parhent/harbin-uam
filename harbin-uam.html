@@ -3,86 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>哈尔滨UAM</title>
+<title>哈尔滨空中交通 - 增强版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0d1117;color:#fff}
-.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#0d1117,#161b22)}
-.h{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:rgba(22,27,34,.95);border-bottom:1px solid #30363d}
-.l{font-size:22px;font-weight:bold;background:linear-gradient(90deg,#58a6ff,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.s{display:flex;align-items:center;gap:8px;font-size:13px;color:#8b949e}
-.o{width:10px;height:10px;border-radius:50%;background:#3fb950;box-shadow:0 0 8px #3fb950}
-.t{font-family:monospace;color:#58a6ff;font-size:15px}
-.m{flex:1;position:relative;background:#0d1117}
-.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#30363d 1px,transparent 1px);background-size:30px 3 0px;opacity:.5}
-.building{position:absolute;background:linear-gradient(180deg,#21262d,#161b22);border:1px solid #30363d}
-.b1{left:15%;top:20%;width:80px;height:120px;border-radius:4px}
-.b2{left:25%;top:40%;width:60px;height:80px;border-radius:3px}
-.b3{left:45%;top:25%;width:100px;height:150px;border-radius:5px}
-.b4{left:55%;top:50%;width:70px;height:90px;border-radius:4px}
-.b5{left:70%;top:30%;width:90px;height:130px;border-radius:4px}
-.river{position:absolute;left:35%;top:35%;width:25%;height:40%;background:linear-gradient(90deg,rgba(56,139,253,.1),rgba(56,139,253,.2));border-radius:20px;transform:rotate(-15deg)}
-.path{position:absolute;top:45%;left:20%;width:55%;height:35%;stroke:#58a6ff;stroke-width:3;stroke-dasharray:12 6;fill:none;opacity:.7}
-.sp{position:absolute;width:40px;height:40px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px rgba(88,166,255,.6)}
-.sp1{left:20%;top:55%;background:linear-gradient(135deg,#58a6ff,#a371f7)}
-.sp2{left:70%;top:35%;background:linear-gradient(135deg,#f0883e,#f778ba)}
-.uav{position:absolute;top:47%;left:40%;width:50px;height:50px;background:linear-gradient(135deg,#3fb950,#58a6ff);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 25px rgba(63,185,80,.8);transition:left 0.5s,top 0.5s;z-index:10}
-.uav::after{content:'';position:absolute;width:70px;height:70px;border:1px solid rgba(63,185,80,.4);border-radius:50%;animation:rip 2s infinite}@keyframesrip{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.3);opacity:0}}
-.lb{position:absolute;padding:4px 10px;background:rgba(0,0,0,.8);border-radius:4px;font-size:11px;white-space:nowrap;border:1px solid #30363d}
-.lb1{left:12%;top:62%}
-.lb2{left:62%;top:42%}
-.i{position:absolute;top:15px;right:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:12px;padding:15px;width:160px}
-.ti{font-size:14px;font-weight:bold;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #30363d}
+html,body{height:100%;overflow:hidden;touch-action:none}
+body{font-family:'Microsoft YaHei',sans-serif;background:#1a1a2e;color:#fff;user-select:none}
+.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#0f0f23 0%,#1a1a2e 50%,#16213e)}
+.h{flex-direction:row;justify-content:space-between;align-items:center;display:flex;padding:12px 20px;background:linear-gradient(90deg,#1e3a5f,#0f3460);border-bottom:2px solid #00d4ff;box-shadow:0 4px 20px rgba(0,212,255,0.3)}
+.l{font-size:20px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 10px rgba(0,212,255,0.5)}
+.s{display:flex;align-items:center;gap:10px}
+.o{width:12px;height:12px;background:#00ff88;border-radius:50%;box-shadow:0 0 15px #00ff88;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(0.9)}}
+.t{font-family:monospace;color:#00d4ff;font-size:16px;text-shadow:0 0 10px rgba(0,212,255,0.5)}
+.m{flex:1;position:relative;background:#0a0a1a;overflow:hidden;cursor:grab}
+.m:active{cursor:grabbing}
+
+/* 网格和街道 */
+.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#00d4ff 1px,transparent 1px),radial-gradient(circle,#ff6b00 0.5px,transparent 0.5px);background-size:50px 50px,25px 25px;opacity:0.3,0.2}
+
+/* 街道 */
+.street{position:absolute;background:linear-gradient(90deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))}
+.street-h{height:8px;width:100%}
+.street-v{width:8px;height:100%}
+
+/* 建筑 */
+.building{position:absolute;background:linear-gradient(180deg,#ff6b00,#ff3366,#8b00ff);border-radius:4px;opacity:0.9;box-shadow:0 0 20px rgba(255,107,0,0.4)}
+.building::before{content:'';position:absolute;top:5px;left:5px;right:5px;height:30%;background:linear-gradient(180deg,rgba(255,255,255,0.3),transparent);border-radius:2px}
+
+/* 河流 */
+.river{position:absolute;background:linear-gradient(90deg,rgba(0,150,255,0.4),rgba(0,200,255,0.6));border-radius:20px;transform:rotate(-15deg);box-shadow:0 0 30px rgba(0,150,255,0.5)}
+
+/* 公园 */
+.park{position:absolute;background:rgba(0,255,136,0.15);border-radius:10px;border:2px solid rgba(0,255,136,0.3)}
+
+/* 路径 */
+.path{position:absolute;top:45%;left:10%;width:80%;height:40%;stroke:#00d4ff;stroke-width:2;stroke-dasharray:8 4;fill:none;opacity:0.6}
+
+/* 飞机标记 */
+.uav{position:absolute;width:30px;height:30px;background:linear-gradient(135deg,#00ff88,#00d4ff);border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 20px rgba(0,255,136,0.8);z-index:100;transition:all 0.5s ease}
+.uav::after{content:'';position:absolute;width:40px;height:40px;border:1px solid rgba(0,255,136,0.5);border-radius:50%;animation:rip 2s infinite}
+@keyframes rip{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.uav-id{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;background:rgba(0,0,0,0.7);padding:2px 6px;border-radius:4px;white-space:nowrap}
+
+/* 起点终点 */
+.sp{position:absolute;width:36px;height:36px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 25px rgba(255,107,0,0.8);z-index:50}
+.sp1{background:linear-gradient(135deg,#00d4ff,#a371f7)}
+.sp2{background:linear-gradient(135deg,#ff6b00,#ff3366)}
+
+/* 标签 */
+.lb{position:absolute;padding:6px 12px;background:rgba(0,0,0,0.85);border-radius:8px;font-size:12px;border:1px solid #00d4ff;white-space:nowrap;z-index:60}
+
+/* 信息面板 */
+.i{position:absolute;top:10px;right:10px;background:rgba(15,52,96,0.95);border:1px solid #00d4ff;border-radius:15px;padding:15px;width:180px;backdrop-filter:blur(10px);box-shadow:0 0 20px rgba(0,212,255,0.3)}
+.ti{font-size:15px;font-weight:bold;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(0,212,255,0.3);color:#00d4ff}
 .r{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px}
-.r .l{color:#8b949e}
-.r .v{color:#58a6ff;font-family:monospace}
-.dv{position:absolute;bottom:15px;right:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:12px;padding:12px}
-.ro{display:flex;align-items:center;gap :8px;padding:8px;background:rgba(88,166,255,.05);border-radius:6px;font-size:11px;margin-bottom:10px}
-.btns{display:flex;gap:8px;margin-top:10px}
-.btn{padding:10px 14px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1}
-.btn:disabled{opacity:.5}
-.btn1{background:linear-gradient(135deg,#238636,#2ea043);color:#fff}
-.btn2{background:rgba(136,46,224,.2);color:#d2a8ff;border:1px solid #8b5cf6}
-.btn3{background:rgba(210,153,34,.2);color:#d29922;border:1px solid #d29922}
-.lg{position:absolute;bottom:15px;left:15px;background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:10px;padding:12px}
-.lg div{font-size:11px;color:#8b949e;margin-bottom:6px}
-.lg item{display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:3px}
-.cb{width:12px;height:12px;border-radius:2px}
-.f{display:flex;justify-content:space-around;padding:10px 20px;background:rgba(22,27,34,.95);border-top:1px solid #30363d}
-.fi{display:flex;gap:6px;font-size:11px}
-.fi .l{color:#8b949e}
-.fi .v{color:#58a6ff;font-family:monospace}
+.r .l{color:#8ecae6}
+.r .v{color:#00ff88;font-weight:bold}
+
+/* 控制面板 */
+.dv{position:absolute;bottom:15px;right:15px;background:rgba(15,52,96,0.95);border:1px solid #00d4ff;border-radius:15px;padding:15px;backdrop-filter:blur(10px)}
+.ro{display:flex;align-items:center;gap:10px;padding:8px;background:rgba(0,212,255,0.1);border-radius:8px;font-size:12px;margin-bottom:10px}
+.btns{display:flex;gap:8px}
+.btn{padding:10px 16px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1;font-weight:bold;transition:all 0.3s}
+.btn:disabled{opacity:0.5}
+.btn1{background:linear-gradient(135deg,#00ff88,#00d4ff);color:#000;box-shadow:0 0 15px rgba(0,255,136,0.5)}
+.btn1:hover{transform:scale(1.05)}
+.btn2{background:rgba(136,46,224,0.3);color:#d2a8ff;border:1px solid #8b5cf6}
+.btn3{background:rgba(255,107,0,0.2);color:#ff6b00;border:1px solid #ff6b00}
+
+/* 图例 */
+.lg{position:absolute;bottom:15px;left:15px;background:rgba(15,52,96,0.95);border:1px solid #00d4ff;border-radius:12px;padding:12px;backdrop-filter:blur(10px)}
+.lg div{font-size:11px;color:#8ecae6;margin-bottom:6px}
+.lg item{display:flex;align-items:center;gap:10px;font-size:10px;margin-bottom:4px}
+.cb{width:14px;height:14px;border-radius:3px}
+
+/* 底部 */
+.f{flex-direction:row;justify-content:space-around;display:flex;padding:12px 20px;background:linear-gradient(90deg,#1e3a5f,#0f3460);border-top:2px solid #00d4ff}
+.fi{display:flex;gap:8px;font-size:12px}
+.fi .l{color:#8ecae6}
+.fi .v{color:#00ff88;font-weight:bold}
+
+/* 飞机列表 */
+.plane-list{position:absolute;top:10px;left:10px;background:rgba(15,52,96,0.95);border:1px solid #00d4ff;border-radius:12px;padding:10px;max-height:200px;overflow-y:auto;width:150px}
+.plane-list-title{font-size:12px;color:#00d4ff;font-weight:bold;margin-bottom:8px}
+.plane-item{font-size:10px;color:#8ecae6;margin-bottom:4px;padding:4px;background:rgba(0,212,255,0.1);border-radius:4px}
 </style>
 </head>
+<body>
+<div class=c>
+<div class=h><div class=l>🚁 哈尔滨UAM数字孪生</div><div class=s><div class=o></div><span style=color:#00ff88>系统在线</span></div><div class=t id=T>00:00:00</div></div>
+<div class=m id=map>
+<div class=grid></div>
+<!-- 街道 -->
+<div class="street street-h" style="top:20%;left:0;width:100%"></div>
+<div class="street street-h" style="top:40%;left:0;width:100%"></div>
+<div class="street street-h" style="top:60%;left:0;width:100%"></div>
+<div class="street street-h" style="top:80%;left:0;width:100%"></div>
+<div class="street street-v" style="left:15%;top:0;height:100%"></div>
+<div class="street street-v" style="left:30%;top:0;height:100%"></div>
+<div class="street street-v" style="left:45%;top:0;height:100%"></div>
+<div class="street street-v" style="left:60%;top:0;height:100%"></div>
+<div class="street street-v" style="left:75%;top:0;height:100%"></div>
+<div class="street street-v" style="left:90%;top:0;height:100%"></div>
+<!-- 河流 -->
+<div class=river style="left:30%;top:30%;width:35%;height:50%"></div>
+<!-- 公园 -->
+<div class=park style="left:5%;top:15%;width:12%;height:10%"></div>
+<div class=park style="left:55%;top:55%;width:15%;height:12%"></div>
+<div class=park style="left:75%;top:70%;width:12%;height:15%"></div>
+<!-- 建筑群 - 彩色高层 -->
+<div class=building style="left:5%;top:25%;width:25px;height:60px;background:linear-gradient(180deg,#ff6b00,#ff3366)"></div>
+<div class=building style="left:10%;top:30%;width:20px;height:80px;background:linear-gradient(180deg,#8b5cf6,#5b21b6)"></div>
+<div class=building style="left:18%;top:22%;width:30px;height:100px;background:linear-gradient(180deg,#00d4ff,#0066cc)"></div>
+<div class=building style="left:35%;top:15%;width:25px;height:90px;background:linear-gradient(180deg,#00ff88,#00aa55)"></div>
+<div class=building style="left:40%;top:25%;width:35px;height:120px;background:linear-gradient(180deg,#ff6b00,#cc4400)"></div>
+<div class=building style="left:50%;top:18%;width:28px;height:85px;background:linear-gradient(180deg,#a371f7,#6b21a3)"></div>
+<div class=building style="left:58%;top:12%;width:32px;height:110px;background:linear-gradient(180deg,#00d4ff,#004488)"></div>
+<div class=building style="left:65%;top:22%;width:22px;height:70px;background:linear-gradient(180deg,#ff3366,#cc1144)"></div>
+<div class=building style="left:72%;top:28%;width:26px;height:95px;background:linear-gradient(180deg,#8b5cf6,#4a1a7b)"></div>
+<div class=building style="left:80%;top:18%;width:30px;height:105px;background:linear-gradient(180deg,#00ff88,#007755)"></div>
+<div class=building style="left:5%;top:55%;width:22px;height:65px;background:linear-gradient(180deg,#ff6b00,#cc5500)"></div>
+<div class=building style="left:12%;top:60%;width:28px;height:80px;background:linear-gradient(180deg,#00d4ff,#0055aa)"></div>
+<div class=building style="left:22%;top:52%;width:25px;height:90px;background:linear-gradient(180deg,#a371f7,#7b2db3)"></div>
+<div class=building style="left:62%;top:58%;width:30px;height:75px;background:linear-gradient(180deg,#ff3366,#dd2255)"></div>
+<div class=building style="left:70%;top:65%;width:26px;height:85px;background:linear-gradient(180deg,#8b5cf6,#5b1db6)"></div>
+<div class=building style="left:78%;top:72%;width:28px;height:70px;background:linear-gradient(180deg,#00ff88,#00aa66)"></div>
+<div class=building style="left:85%;top:55%;width:22px;height:60px;background:linear-gradient(180deg,#ff6b00,#cc5500)"></div>
+<div class=building style="left:40%;top:65%;width:30px;height:95px;background:linear-gradient(180deg,#00d4ff,#0044aa)"></div>
+<div class=building style="left:52%;top:70%;width:25px;height:80px;background:linear-gradient(180deg,#a371f7,#6b1da3)"></div>
+<!-- 更多中小建筑 -->
+<div class=building style="left:8%;top:42%;width:15px;height:35px;background:linear-gradient(180deg,#f778ba,#db2777)"></div>
+<div class=building style="left:25%;top:38%;width:18px;height:40px;background:linear-gradient(180deg,#f0883e,#c2410c)"></div>
+<div class=building style="left:45%;top:45%;width:16px;height:38px;background:linear-gradient(180deg,#3fb950,#15803d)"></div>
+<div class=building style="left:68%;top:42%;width:14px;height:32px;background:linear-gradient(180deg,#a371f7,#7c3aed)"></div>
+<div class=building style="left:82%;top:38%;width:17px;height:42px;background:linear-gradient(180deg,#60a5fa,#2563eb)"></div>
+<div class=building style="left:15%;top:75%;width:14px;height:30px;background:linear-gradient(180deg,#f778ba,#be185d)"></div>
+<div class=building style="left:38%;top:82%;width:16px;height:35px;background:linear-gradient(180deg,#f0883e,#c2410c)"></div>
+<div class=building style="left:75%;top:88%;width:15px;height:28px;background:linear-gradient(180deg,#3fb950,#166534)"></div>
+<!-- 航线 -->
+<svg class=path viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M 10 70 Q 30 50 50 55 Q 70 60 90 35" style="stroke-dasharray:12 6"/></svg>
+<!-- 起点终点 -->
+<div class="sp sp1" style="left:10%;top:65%">🏁</div>
+<div class="sp sp2" style="left:85%;top:30%">🎭</div>
+<!-- 标签 -->
+<div class=lb style="left:3%;top:72%">防洪纪念塔</div>
+<div class=lb style="left:78%;top:25%">哈尔滨大剧院</div>
 
-<body><div style="display:flex;flex-direction:column;height:100vh"><div style="display:flex;justify-content:space-between;align-items:center;padding:15px;background:#161b22;border-bottom:1px solid #30363d"><div style="font-size:20px;background:linear-gradient(90deg,#58a6ff,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🚁 Harbin UAM</div><div style="display:flex;align-items:center;gap:8px;color:#8b949e"><div style="width:10px;height:10px;background:#3fb950;border-radius:50%"></div><span>系统在线</span></div><div style="color:#58a6ff;font-family:monospace" id="T">00:00:00</div></div><div style="flex:1;position:relative;background:#0d1117"><div style="position:absolute;inset:0;background-image:radial-gradient(circle,#30363d 1px,transparent 1px);background-size:30px 30px"></div><div style="position:absolute;left:15%;top:20%;width:80px;height:120px;background:#21262d;border:1px solid #30363d;border-radius:4px"></div><div style="position:absolute;left:25%;top:40%;width:60px;height:80px;background:#21262d;border:1px solid #30363d;border-radius:3px"></div><div style="position:absolute
+<!-- 动态飞机群 -->
+<div class=uav id=U1 style="left:15%;top:55%">🚁<div class=uav-id>EVTOL-01</div></div>
+<div class=uav id=U2 style="left:25%;top:45%">🚁<div class=uav-id>EVTOL-02</div></div>
+<div class=uav id=U3 style="left:35%;top:60%">🚁<div class=uav-id>EVTOL-03</div></div>
+<div class=uav id=U4 style="left:45%;top:40%">🚁<div class=uav-id>EVTOL-04</div></div>
+<div class=uav id=U5 style="left:55%;top:50%">🚁<div class=uav-id>EVTOL-05</div></div>
+<div class=uav id=U6 style="left:65%;top:35%">🚁<div class=uav-id>EVTOL-06</div></div>
+<div class=uav id=U7 style="left:75%;top:55%">🚁<div class=uav-id>EVTOL-07</div></div>
+<div class=uav id=U8 style="left:20%;top:70%">🚁<div class=uav-id>EVTOL-08</div></div>
+<div class=uav id=U9 style="left:50%;top:65%">🚁<div class=uav-id>EVTOL-09</div></div>
+<div class=uav id=U10 style="left:80%;top:45%">🚁<div class=uav-id>EVTOL-10</div></div>
 
-;left:45%;top:25%;width:100px;height:150px;background:#21262d;border:1px solid #30363d;border-radius:5px"></div><div style="position:absolute;left:55%;top:50%;width:70px;height:90px;background:#21262d;border:1px solid #30363d;border-radius:4px"></div><div style="position:absolute;left:70%;top:30%;width:90px;height:130px;background:#21262d;border:1px solid #30363d;border-radius:4px"></div><svg style="position:absolute;top:45%;left:20%;width:55%;stroke:#58a6ff;stroke-width:3;stroke-dasharray:12 6;fill:none" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M 15 60 Q 40 45 55 50 Q 70 55 85 35"/></svg><div style="position:absolute;left:20%;top:55%;width:40px;height:40px;background:linear-gradient(135deg,#58a6ff,#a371f7);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:18px">🏁</div><div style="position:absolute;left:70%;top:35%;width:40px;height:40px;background:linear-gradient(135deg,#f0883e,#f778ba);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:18px">🎭</div><div style="position:absolute;top:47%;left:40%;width:50px;height:50px;background:linear-gradient(135deg
+<!-- 飞机列表 -->
+<div class=plane-list>
+<div class=plane-list-title>✈️ 活跃飞行器 (10)</div>
+<div class=plane-item>EVTOL-01 | 高度: 350m</div>
+<div class=plane-item>EVTOL-02 | 高度: 280m</div>
+<div class=plane-item>EVTOL-03 | 高度: 420m</div>
+<div class=plane-item>EVTOL-04 | 高度: 310m</div>
+<div class=plane-item>EVTOL-05 | 高度: 380m</div>
+<div class=plane-item>EVTOL-06 | 高度: 290m</div>
+<div class=plane-item>EVTOL-07 | 高度: 450m</div>
+<div class=plane-item>EVTOL-08 | 高度: 330m</div>
+<div class=plane-item>EVTOL-09 | 高度: 400m</div>
+<div class=plane-item>EVTOL-10 | 高度: 360m</div>
+</div>
 
-argin-bottom:8px;font-size:12px"><span style="color:#8b949e">速度:</span><span style="color:#58a6ff" id="SPD">0 km/h</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="color:#8b949e">剩余:</span><span style="color:#58a6ff" id="REM">0 km</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="color:#8b949e">状态:</span><span style="color:#8b949e" id="STA">待起飞</span></div></div><div style="position:absolute;bottom:15px;right:15px;background:rgba(22,27,34,0.95);border:1px solid #30363d;border-radius:12px;padding:12px"><div style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(88,166,255,0.05);border-radius:6px;font-size:11px;margin-bottom:10px"><span>🏁</span><span>防洪纪念塔 → 哈尔滨大剧院</span></div><div style="display:flex;gap:8px"><button style="padding:10px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1;background:linear-gradient(135deg,#238636,#2ea043);color:#fff" onclick="S()">▶ 起飞</button><button style="padding:10px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1;opacity:0.5;background:rgba(136,46,224,0.2);colo
+<!-- 信息面板 -->
+<div class=i><div class=ti>✈️ 飞行状态</div>
+<div class=r><span class=l>活跃飞行器:</span><span class=v>10</span></div>
+<div class=r><span class=l>平均高度:</span><span class=v>351 m</span></div>
+<div class=r><span class=l>平均速度:</span><span class=v>75 km/h</span></div>
+<div class=r><span class=l>今日航班:</span><span class=v>156</span></div>
+<div class=r><span class=l>空域状态:</span><span class=v style=color:#00ff88>繁忙</span></div></div>
 
-,#3fb950,#58a6ff);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:10;transition:left 0.5s,top 0.5s" id="U">🚁</div><div style="position:absolute;left:12%;top:62%;padding:4px 10px;background:rgba(0,0,0,0.8);border-radius:4px;font-size:11px;border:1px solid #30363d">防洪纪念塔</div><div style="position:absolute;left:62%;top:42%;padding:4px 10px;background:rgba(0,0,0,0.8);border-radius:4px;font-size:11px;border:1px solid #30363d">哈尔滨大剧院</div><div style="position:absolute;top:15px;right:15px;background:rgba(22,27,34,0.95);border:1px solid #30363d;border-radius:12px;padding:15px;width:160px"><div style="font-size:14px;font-weight:bold;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #30363d">✈️ 飞行状态</div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="color:#8b949e">ID:</span><span style="color:#58a6ff">EVTOL-001</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="color:#8b949e">高度:</span><span style="color:#58a6ff" id="ALT">0 m</span></div><div style="display:flex;justify-content:space-between;m
+<!-- 控制面板 -->
+<div class=dv><div class=ro><span>🏁</span><span>防洪纪念塔 → 哈尔滨大剧院</span></div><div class=btns><button class=btn btn1 onclick=S()>▶ 起飞</button><button class=btn btn2 onclick=P() disabled>⏸</button><button class=btn btn3 onclick=R()>↺</button></div></div>
 
-r:#d2a8ff;border:1px solid #8b5cf6" id="B2" onclick="P()" disabled>⏸ 暂停</button><button style="padding:10px;border:none;border-radius:8px;font-size:12px;cursor:pointer;flex:1;background:rgba(210,153,34,0.2);color:#d29922;border:1px solid #d29922" onclick="R()">↺ 重置</button></div></div><div style="position:absolute;bottom:15px;left:15px;background:rgba(22,27,34,0.95);border:1px solid #30363d;border-radius:10px;padding:12px"><div style="font-size:11px;color:#8b949e;margin-bottom:6px">高度层</div><div style="display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:3px"><span style="width:12px;height:12px;background:#3fb950;border-radius:2px"></span><span>低空 0-100m</span></div><div style="display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:3px"><span style="width:12px;height:12px;background:#58a6ff;border-radius:2px"></span><span>中空 100-300m</span></div><div style="display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:3px"><span style="width:12px;height:12px;background:#f0883e;border-radius:2px"></span><span>高空 300m+</span></div></div></div><div style="display:flex;justify-content:space-around;padding:10px;background:rgba(22,27,34,0.95);bord
+<!-- 图例 -->
+<div class=lg><div>高度层 (m)</div><div item><span class=cb style=background:#00ff88></span><span>低空 0-200</span></div><div item><span class=cb style=background:#00d4ff></span><span>中空 200-500</span></div><div item><span class=cb style=background:#a371f7></span><span>高空 500+</span></div></div>
+</div>
+<div class=f><div class=fi><span class=l>活跃:</span><span class=v>10</span></div><div class=fi><span class=l>航班:</span><span class=v>156</span></div><div class=fi><span class=l>空域:</span><span class=v style=color:#ff6b00>繁忙</span></div></div>
+</div>
+<script>
+// 多飞机飞行系统
+let planes = [];
+const PLANE_COUNT = 10;
+const C = {D:8,Sp:75,Max:800,Min:200,Dur:15};
 
-er-top:1px solid #30363d"><div style="display:flex;gap:6px;font-size:11px"><span style="color:#8b949e">活跃:</span><span style="color:#58a6ff" id="AC">0</span></div><div style="display:flex;gap:6px;font-size:11px"><span style="color:#8b949e">航班:</span><span style="color:#58a6ff" id="TF">0</span></div><div style="display:flex;gap:6px;font-size:11px"><span style="color:#8b949e">空域:</span><span style="color:#3fb950">畅通</span></div></div></div><script>let F=false,Pf=false,Pr=0,Ani;const C={D:6.5,Sp:80,Mx:200,Mn:50,Dur:12};const sp={x:[40,45,50,55,60,65],y:[47,42,38,35,33,35]};function S(){if(F&&!Pf)return;if(Pf){Pf=false;document.getElementById('B1').disabled=true;document.getElementById('B2').disabled=false;A();return}F=true;Pf=false;Pr=0;document.getElementById('B1').disabled=true;document.getElementById('B2').disabled=false;A()}function A(){if(!F||Pf)return;Pr+=1/C.Dur;if(Pr>=1){Pr=1;FC();return}const i=Math.min(Math.floor(Pr*6),5),t=Pr*6-i,st=sp[i],en=sp[i+1]||st,x=st.x+(en.x-st.x)*t,y=st.y+(en.y-st.y)*t;document.getElementById('U').style.left=x+'%';document.getElementById('U').style.top=y+'%';const h=C.Mn+(C.Mx-C.Mn)*Math.sin(Pr*Math.PI),s=Pr<.1?C.Sp*(Pr/.1):Pr>.9?C.Sp*((1-Pr)/.1):C
+for(let i=1;i<=PLANE_COUNT;i++){
+    const el = document.getElementById('U'+i);
+    if(el){
+        const startX = 10 + Math.random()*15;
+        const startY = 50 + Math.random()*30;
+        const endX = 75 + Math.random()*15;
+        const endY = 30 + Math.random()*20;
+        const baseAlt = 200 + Math.random()*600;
+        planes.push({
+            el: el,
+            start: {x:startX,y:startY},
+            end: {x:endX,y:endY},
+            alt: baseAlt,
+            speed: 60 + Math.random()*30,
+            id: 'EVTOL-'+String(i).padStart(2,'0'),
+            progress: Math.random()
+        });
+    }
+}
 
-.Sp,rem=C.D*(1-Pr);document.getElementById('ALT').textContent=Math.round(h)+' m';document.getElementById('SPD').textContent=Math.round(s)+' km/h';document.getElementById('REM').textContent=rem.toFixed(1)+' km';const stt=document.getElementById('STA');if(Pr<.1){stt.textContent='起飞中';stt.style.color='#3fb950'}else if(Pr>.9){stt.textContent='降落中';stt.style.color='#3fb950'}else{stt.textContent='巡航中';stt.style.color='#3fb950'}document.getElementById('AC').textContent='1';document.getElementById('TF').textContent='1';Ani=setTimeout(A,1000)}function FC(){F=false;Pr=1;document.getElementById('U').style.left='70%';document.getElementById('U').style.top='35%';document.getElementById('STA').textContent='已到达';document.getElementById('STA').style.color='#3fb950';document.getElementById('ALT').textContent='0 m';document.getElementById('SPD').textContent='0 km/h';document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 重新起飞';document.getElementById('B2').disabled=true}function P(){if(!F)return;Pf=true;clearTimeout(Ani);document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 继续';document.getElementById('B2').disabled=true;docum
-
-ent.getElementById('STA').textContent='已暂停';document.getElementById('STA').style.color='#f0883e'}function R(){F=false;Pf=false;Pr=0;clearTimeout(Ani);document.getElementById('U').style.left='40%';document.getElementById('U').style.top='47%';document.getElementById('ALT').textContent='0 m';document.getElementById('SPD').textContent='0 km/h';document.getElementById('REM').textContent='6.5 km';document.getElementById('STA').textContent='待起飞';document.getElementById('STA').style.color='#8b949e';document.getElementById('AC').textContent='0';document.getElementById('TF').textContent='0';document.getElementById('B1').disabled=false;document.getElementById('B1').textContent='▶ 起飞';document.getElementById('B2').disabled=true}function T(){const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');document.getElementById('T').textContent=h+':'+m+':'+s}setInterval(T,1000);T();</script></body></html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+let F=false,Pf=false,Pr=0,Ani;
+function S(){if(F&&!Pf)return;F=true;Pf=false;Ani=setInterval(A,100)}
+function A(){
+    if(!F||Pf)return;
+    planes.forEach((p,i)=>{
+        p.progress+=0.003;
+        if(p.progress>1)p.progress=0;
+        const x=p.start.x+(p.end.x-p.start.x)*p.progress;
+        const y=p.start.y+(p.end.y-p.start.y)*p.progress+p.progress*(1-p.progress)*20;
+        p.el.style.left=x+'%';
+        p.el.style.top=y+'%';
+        const h=Math.round(p.alt+Math.sin(p.progress*Math.PI)*400);
+        p.el.querySelector('.uav-id').textContent=p.id+' | '+h+'m';
+    });
+    Pr+=0.01;if(Pr>1)Pr=0;
+}
+function P(){Pf=!Pf}
+function R(){F=false;Pf=false;clearInterval(Ani);planes.forEach((p,i)=>{p.el.style.left=p.start.x+'%';p.el.style.top=p.start.y+'%';p.progress=0})}
+function T(){const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');document.getElementById('T').textContent=h+':'+m+':'+s}
+setInterval(T,1000);T();
+// 地图拖拽
+const map=document.getElementById('map');let dx=0,dy=0,ox=0,oy=0;
+map.addEventListener('mousedown',e=>{ox=e.clientX;oy=e.clientY;document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu)});
+function mm(e){dx=ox-e.clientX;dy=oy-e.clientY;map.scrollLeft+=dx;map.scrollTop+=dy;ox=e.clientX;oy=e.clientY}
+function mu(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu)}
+// 触屏支持
+map.addEventListener('touchstart',e=>{ox=e.touches[0].clientX;oy=e.touches[0].clientY});
+map.addEventListener('touchmove',e=>{dx=ox-e.touches[0].clientX;dy=oy-e.touches[0].clientY;map.scrollLeft+=dx;map.scrollTop+=dy;ox=e.touches[0].clientX;oy=e.touches[0].clientY;e.preventDefault()});
+</script>
+</body>
+</html>
