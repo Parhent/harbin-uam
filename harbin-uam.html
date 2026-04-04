@@ -3,158 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>哈尔滨UAM - 终极版</title>
+<title>哈尔滨UAM - 至尊版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;touch-action:none}
-body{font-family:'Microsoft YaHei',sans-serif;background:#050508;color:#fff;user-select:none}
-.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#020205 0%,#050510 50%,#0a0a15)}
-.h{flex-direction:row;justify-content:space-between;align-items:center;display:flex;padding:8px 16px;background:linear-gradient(90deg,#0d0d1a,#050510);border-bottom:2px solid #00d4ff}
-.l{font-size:16px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#00ff88,#ff6b00,#a371f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.s{display:flex;align-items:center;gap:6px}
-.o{width:8px;height:8px;background:#00ff88;border-radius:50%;box-shadow:0 0 12px #00ff88;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.t{font-family:monospace;color:#00d4ff;font-size:12px}
-.m{flex:1;position:relative;background:#030306;overflow:auto}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Microsoft YaHei',sans-serif;background:#020204;color:#fff;user-select:none}
+.c{flex-direction:column;display:flex;height:100vh;background:linear-gradient(180deg,#010102 0%,#030308 50%,#050510)}
+.h{flex-direction:row;justify-content:space-between;align-items:center;display:flex;padding:6px 12px;background:linear-gradient(90deg,#080810,#040408);border-bottom:1px solid #00d4ff;box-shadow:0 2px 15px rgba(0,212,255,0.3)}
+.l{font-size:14px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#00ff88,#ff6b00,#a371f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s{display:flex;align-items:center;gap:4px}
+.o{width:6px;height:6px;background:#00ff88;border-radius:50%;box-shadow:0 0 10px #00ff88;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.t{font-family:monospace;color:#00d4ff;font-size:10px}
+.m{flex:1;position:relative;background:#010102;overflow:auto}
 
 /* 网格 */
-.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#00d4ff 0.4px,transparent 0.4px),radial-gradient(circle,#ff6b00 0.2px,transparent 0.2px);background-size:25px 25px,50px 50px;opacity:0.15,0.08}
+.grid{position:absolute;inset:0;background-image:radial-gradient(circle,#00d4ff 0.3px,transparent 0.3px),radial-gradient(circle,#ff6b00 0.15px,transparent 0.15px);background-size:20px 20px,40px 40px;opacity:0.12,0.06}
 
 /* 街道 */
-.street{position:absolute;background:rgba(255,255,255,0.06)}
-.street-h{height:5px}
-.street-v{width:5px}
-.main-street{height:8px;background:rgba(255,255,255,0.12)}
-.main-street-v{width:8px}
+.street{position:absolute;background:rgba(255,255,255,0.04)}
+.street-h{height:4px}
+.street-v{width:4px}
+.main-street{height:6px;background:rgba(255,255,255,0.08)}
+.main-street-v{width:6px}
 
-/* 河流湖泊 */
-.river{position:absolute;background:linear-gradient(180deg,rgba(0,80,180,0.25),rgba(0,120,220,0.4));border-radius:25px;box-shadow:0 0 30px rgba(0,100,200,0.3)}
+/* 河流 */
+.river{position:absolute;background:linear-gradient(180deg,rgba(0,60,150,0.2),rgba(0,100,200,0.35));border-radius:20px;box-shadow:0 0 25px rgba(0,80,180,0.25)}
 
-/* 公园绿地 */
-.park{position:absolute;background:rgba(0,180,80,0.08);border-radius:12px;border:1px solid rgba(0,255,100,0.15)}
+/* 公园 */
+.park{position:absolute;background:rgba(0,150,70,0.06);border-radius:8px;border:1px solid rgba(0,200,100,0.12)}
 
 /* 建筑 */
-.building{position:absolute;border-radius:2px;opacity:0.92}
-.building::before{content:'';position:absolute;top:2px;left:2px;right:2px;height:20%;background:linear-gradient(180deg,rgba(255,255,255,0.2),transparent);border-radius:1px}
+.building{position:absolute;border-radius:2px;opacity:0.9}
 
 /* 路径 */
-.path{position:absolute;stroke:#00d4ff;stroke-width:1.5;stroke-dasharray:8 4;fill:none;opacity:0.4}
+.path{position:absolute;stroke:#00d4ff;stroke-width:1;stroke-dasharray:6 3;fill:none;opacity:0.35}
 
 /* 飞机 */
-.uav{position:absolute;width:24px;height:24px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:100;transition:left 0.2s,top 0.2s}
-.uav::after{content:'';position:absolute;width:30px;height:30px;border:1px solid;border-radius:50%;animation:rip 2s infinite}
-@keyframes rip{0%{transform:scale(0.7);opacity:1}100%{transform:scale(1.3);opacity:0}}
-.uav-id{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:7px;background:rgba(0,0,0,0.85);padding:1px 4px;border-radius:2px;white-space:nowrap}
+.uav{position:absolute;width:20px;height:20px;border-radius:50%;border:1px solid #fff;display:flex;align-items:center;justify-content:center;font-size:8px;z-index:100;transition:left 0.15s,top 0.15s}
+.uav-id{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:6px;background:rgba(0,0,0,0.8);padding:1px 3px;border-radius:2px}
 
 /* 起点终点 */
-.sp{position:absolute;width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:50}
-.sp1{background:linear-gradient(135deg,#00d4ff,#6366f1)}
-.sp2{background:linear-gradient(135deg,#f97316,#dc2626)}
+.sp{position:absolute;width:24px;height:24px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:50}
+.sp1{background:linear-gradient(135deg,#00d4ff,#4f46e5)}
+.sp2{background:linear-gradient(135deg,#ea580c,#dc2626)}
 
 /* 标签 */
-.lb{position:absolute;padding:4px 8px;background:rgba(0,0,0,0.8);border-radius:4px;font-size:9px;border:1px solid #00d4ff}
+.lb{position:absolute;padding:3px 6px;background:rgba(0,0,0,0.75);border-radius:3px;font-size:8px;border:0.5px solid #00d4ff}
 
 /* 面板 */
-.panel{position:absolute;background:rgba(8,12,24,0.95);border:1px solid #00d4ff;border-radius:10px;padding:10px;backdrop-filter:blur(8px)}
-.i{top:8px;right:8px;width:140px}
-.ti{font-size:12px;font-weight:bold;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(0,212,255,0.3);color:#00d4ff}
-.r{display:flex;justify-content:space-between;margin-bottom:5px;font-size:10px}
-.r .l{color:#7eb8d6}
+.panel{position:absolute;background:rgba(5,8,16,0.95);border:0.5px solid #00d4ff;border-radius:8px;padding:8px}
+.i{top:6px;right:6px;width:100px}
+.ti{font-size:10px;font-weight:bold;margin-bottom:6px;padding-bottom:3px;border-bottom:0.5px solid rgba(0,212,255,0.3);color:#00d4ff}
+.r{display:flex;justify-content:space-between;margin-bottom:4px;font-size:8px}
+.r .l{color:#5a8a9e}
 .r .v{color:#00ff88;font-weight:bold}
 
-.dv{bottom:8px;right:8px;width:180px}
-.ro{display:flex;align-items:center;gap:6px;padding:6px;background:rgba(0,212,255,0.08);border-radius:5px;font-size:9px;margin-bottom:6px}
-.btns{display:flex;gap:5px}
-.btn{padding:6px 10px;border:none;border-radius:5px;font-size:10px;cursor:pointer;flex:1;font-weight:bold}
+.dv{bottom:6px;right:6px;width:140px}
+.ro{display:flex;align-items:center;gap:4px;padding:4px;background:rgba(0,212,255,0.06);border-radius:4px;font-size:8px;margin-bottom:4px}
+.btns{display:flex;gap:4px}
+.btn{padding:5px 8px;border:none;border-radius:4px;font-size:8px;cursor:pointer;flex:1;font-weight:bold}
 .btn:disabled{opacity:0.5}
 .btn1{background:linear-gradient(135deg,#00ff88,#00d4ff);color:#000}
-.btn2{background:rgba(139,92,246,0.25);color:#a78bfa;border:1px solid #8b5cf6}
-.btn3{background:rgba(255,107,0,0.15);color:#ff6b00;border:1px solid #ff6b00}
+.btn2{background:rgba(139,92,246,0.2);color:#a78bfa;border:0.5px solid #8b5cf6}
+.btn3{background:rgba(255,107,0,0.1);color:#ff6b00;border:0.5px solid #ff6b00}
 
-.lg{bottom:8px;left:8px}
-.lg div{font-size:9px;color:#7eb8d6;margin-bottom:3px}
-.lg item{display:flex;align-items:center;gap:5px;font-size:8px;margin-bottom:2px}
-.cb{width:10px;height:10px;border-radius:2px}
+.lg{bottom:6px;left:6px;width:80px}
+.lg div{font-size:8px;color:#5a8a9e;margin-bottom:2px}
+.lg item{display:flex;align-items:center;gap:4px;font-size:7px;margin-bottom:1px}
+.cb{width:8px;height:8px;border-radius:1px}
 
-.f{flex-direction:row;justify-content:space-around;display:flex;padding:8px 16px;background:linear-gradient(90deg,#0d0d1a,#050510);border-top:1px solid #00d4ff}
-.fi{display:flex;gap:5px;font-size:10px}
-.fi .l{color:#7eb8d6}
+.f{flex-direction:row;justify-content:space-around;display:flex;padding:6px 12px;background:linear-gradient(90deg,#080810,#040408);border-top:1px solid #00d4ff}
+.fi{display:flex;gap:4px;font-size:8px}
+.fi .l{color:#5a8a9e}
 .fi .v{color:#00ff88}
 
-/* 统计栏 */
-.stats{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(8,12,24,0.95);border:1px solid #00d4ff;border-radius:8px;padding:6px 12px;display:flex;gap:15px}
+/* 统计 */
+.stats{position:absolute;top:6px;left:50%;transform:translateX(-50%);background:rgba(5,8,16,0.95);border:0.5px solid #00d4ff;border-radius:6px;padding:4px 8px;display:flex;gap:10px}
 .stat{text-align:center}
-.stat-n{font-size:14px;font-weight:bold;color:#00ff88}
-.stat-l{font-size:8px;color:#7eb8d6}
+.stat-n{font-size:12px;font-weight:bold;color:#00ff88}
+.stat-l{font-size:6px;color:#5a8a9e}
 
 /* 雷达 */
-.radar{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);width:80px;height:80px;border:2px solid rgba(0,212,255,0.3);border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.05),transparent)}
-.radar::after{content:'';position:absolute;top:50%;left:50%;width:40px;height:2px;background:linear-gradient(90deg,transparent,#00d4ff);animation:scan 3s linear infinite;transform-origin:left center}
+.radar{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:50px;height:50px;border:1px solid rgba(0,212,255,0.2);border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.03),transparent)}
+.radar::after{content:'';position:absolute;top:50%;left:50%;width:25px;height:1px;background:linear-gradient(90deg,transparent,#00d4ff);animation:scan 2s linear infinite;transform-origin:left center}
 @keyframes scan{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+/* 进度条 */
+.progress-bar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:100px;height:4px;background:rgba(0,212,255,0.2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00ff88,#00d4ff);width:0%;transition:width 0.3s}
 </style>
 </head>
 <body>
 <div class=c>
-<div class=h><div class=l>🚁 哈尔滨UAM v3.0</div><div class=s><div class=o></div><span style=color:#00ff88;font-size:10px>系统在线</span></div><div class=t id=T>00:00:00</div></div>
+<div class=h><div class=l>🚁 哈尔滨UAM 至尊版</div><div class=s><div class=o></div><span style=color:#00ff88;font-size:8px>在线</span></div><div class=t id=T>00:00:00</div></div>
 <div class=m id=map>
 <div class=grid></div>
 
-<!-- 街道网格 -->
-<div class="street main-street" style="top:15%;"></div>
-<div class="street main-street" style="top:30%;"></div>
-<div class="street main-street" style="top:45%;"></div>
-<div class="street main-street" style="top:60%;"></div>
-<div class="street main-street" style="top:75%;"></div>
-<div class="street main-street-v" style="left:12%;"></div>
-<div class="street main-street-v" style="left:27%;"></div>
-<div class="street main-street-v" style="left:42%;"></div>
-<div class="street main-street-v" style="left:57%;"></div>
-<div class="street main-street-v" style="left:72%;"></div>
-<div class="street main-street-v" style="left:87%;"></div>
-
-<div class="street" style="top:8%;height:1px;width:100%"></div>
-<div class="street" style="top:22%;height:1px;width:100%"></div>
-<div class="street" style="top:38%;height:1px;width:100%"></div>
-<div class="street" style="top:52%;height:1px;width:100%"></div>
-<div class="street" style="top:68%;height:1px;width:100%"></div>
-<div class="street" style="top:82%;height:1px;width:100%"></div>
-<div class="street" style="left:5%;width:1px;height:100%"></div>
-<div class="street" style="left:20%;width:1px;height:100%"></div>
-<div class="street" style="left:35%;width:1px;height:100%"></div>
-<div class="street" style="left:50%;width:1px;height:100%"></div>
-<div class="street" style="left:65%;width:1px;height:100%"></div>
-<div class="street" style="left:80%;width:1px;height:100%"></div>
-<div class="street" style="left:95%;width:1px;height:100%"></div>
+<!-- 街道 -->
+<script>
+const streets = [12,25,38,50,62,75,88];
+streets.forEach(p=>{document.write('<div class="street main-street" style="top:'+p+'%"></div><div class="street main-street-v" style="left:'+p+'%"></div>')});
+[5,18,32,45,58,70,82,95].forEach(p=>{document.write('<div class="street" style="top:'+p+'%;height:1px"></div>')});
+[8,22,35,48,62,75,92].forEach(p=>{document.write('<div class="street" style="left:'+p+'%;width:1px;height:100%"></div>')});
+</script>
 
 <!-- 河流 -->
-<div class=river style="left:20%;top:20%;width:25%;height:40%"></div>
-<div class=river style="left:60%;top:55%;width:15%;height:25%"></div>
+<div class=river style="left:15%;top:15%;width:20%;height:35%"></div>
+<div class=river style="left:55%;top:50%;width:12%;height:20%"></div>
 
 <!-- 公园 -->
-<div class=park style="left:2%;top:5%;width:8%;height:6%"></div>
-<div class=park style="left:45%;top:45%;width:10%;height:8%"></div>
-<div class=park style="left:68%;top:65%;width:8%;height:10%"></div>
-<div class=park style="left:12%;top:50%;width:6%;height:6%"></div>
-<div class=park style="left:75%;top:12%;width:7%;height:8%"></div>
+<div class=park style="left:1%;top:3%;width:6%;height:5%"></div>
+<div class=park style="left:40%;top:40%;width:8%;height:6%"></div>
+<div class=park style="left:65%;top:60%;width:6%;height:8%"></div>
+<div class=park style="left:10%;top:45%;width:5%;height:5%"></div>
+<div class=park style="left:72%;top:10%;width:5%;height:6%"></div>
+<div class=park style="left:30%;top:70%;width:6%;height:6%"></div>
 
-<!-- 大量建筑 -->
+<!-- 大量彩色建筑 -->
 <script>
-const bColors = ['#ff6b00','#8b5cf6','#00d4ff','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444','#06b6d4','#a855f7','#f97316','#10b981'];
-for(let i=0;i<80;i++){
-    document.write('<div class="building" style="left:'+(2+Math.random()*92)+'%;top:'+(5+Math.random()*85)+'%;width:'+(8+Math.random()*20)+'px;height:'+(20+Math.random()*80)+'px;background:linear-gradient(180deg,'+bColors[i%bColors.length]+','+bColors[(i+3)%bColors.length]+')"></div>');
+const bColors = ['#ff6b00','#8b5cf6','#00d4ff','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444','#06b6d4','#a855f7','#f97316','#10b981','#f43f5e','#0ea5e9','#d946ef','#f97316','#84cc16'];
+for(let i=0;i<120;i++){
+    const c = bColors[i%bColors.length];
+    document.write('<div class="building" style="left:'+(1+Math.random()*94)+'%;top:'+(3+Math.random()*90)+'%;width:'+(5+Math.random()*18)+'px;height:'+(15+Math.random()*70)+'px;background:linear-gradient(180deg,'+c+','+bColors[(i+5)%bColors.length]+')"></div>');
 }
 </script>
 
 <!-- 航线 -->
-<svg class=path style="top:35%;left:5%;width:90%;height:40%" viewBox="0 0 100 100"><path d="M 3 70 Q 20 50 40 55 Q 60 60 97 25"/></svg>
+<svg class=path style="top:30%;left:3%;width:94%;height:45%" viewBox="0 0 100 100"><path d="M 2 75 Q 15 55 35 58 Q 55 62 98 20"/></svg>
 
 <!-- 起点终点 -->
-<div class="sp sp1" style="left:3%;top:62%">🏁</div>
-<div class="sp sp2" style="left:92%;top:20%">🎭</div>
+<div class="sp sp1" style="left:2%;top:68%">🏁</div>
+<div class="sp sp2" style="left:95%;top:15%">🎭</div>
 
 <!-- 标签 -->
-<div class=lb style="left:1%;top:68%">防洪纪念塔</div>
-<div class=lb style="left:86%;top:12%">大剧院</div>
+<div class=lb style="left:0%;top:72%">防洪纪念塔</div>
+<div class=lb style="left:90%;top:8%">大剧院</div>
 
 <!-- 飞机容器 -->
 <div id=planes-container></div>
@@ -166,38 +150,40 @@ for(let i=0;i<80;i++){
 <div class=stat><div class=stat-n id=c3>0</div><div class=stat-l>km/h</div></div>
 </div>
 
-<!-- 雷达动画 -->
+<!-- 雷达 -->
 <div class=radar></div>
+
+<!-- 进度条 -->
+<div class=progress-bar><div class=progress-fill id=prog></div></div>
 
 <!-- 面板 -->
 <div class="panel i">
-<div class=ti>✈️ 状态</div>
+<div class=ti>✈️</div>
 <div class=r><span class=l>飞行器:</span><span class=v id=ac>0</span></div>
-<div class=r><span class=l>平均高度:</span><span class=v id=aa>0 m</span></div>
-<div class=r><span class=l>平均速度:</span><span class=v id=as>0 km/h</span></div>
-<div class=r><span class=l>航班:</span><span class=v id=fl>0</span></div>
+<div class=r><span class=l>高度:</span><span class=v id=aa>0 m</span></div>
+<div class=r><span class=l>速度:</span><span class=v id=as>0 km/h</span></div>
 </div>
 
 <div class="panel dv">
-<div class=ro><span>🏁</span><span>哈尔滨UAM系统</span></div>
+<div class=ro>🏁 哈尔滨UAM系统</div>
 <div class=btns>
 <button class=btn btn1 onclick=startAll()>▶</button>
-<button class=btn btn2 onclick=pauseAll() id=bp disabled>⏸</button>
+<button class=btn btn2 onclick=pauseAll() id=bp>⏸</button>
 <button class=btn btn3 onclick=resetAll()>↺</button>
 </div>
 </div>
 
-<div class="panel lg"><div>高度层</div><div item><span class=cb style=background:#00ff88></span><span>低</span></div><div item><span class=cb style=background:#00d4ff></span><span>中</span></div><div item><span class=cb style=background:#a371f7></span><span>高</span></div></div>
+<div class="panel lg"><div>高度</div><div item><span class=cb style=background:#00ff88></span><span>低</span></div><div item><span class=cb style=background:#00d4ff></span><span>中</span></div><div item><span class=cb style=background:#a371f7></span><span>高</span></div></div>
 </div>
 
 <div class=f><div class=fi><span class=l>活跃:</span><span class=v id=fa>0</span></div><div class=fi><span class=l>航班:</span><span class=v id=ff>0</span></div></div>
 </div>
 
 <script>
-// 60架飞机
-const PLANE_COUNT = 60;
+// 100架飞机系统
+const PLANE_COUNT = 100;
 const planes = [];
-const colors = ['#00ff88','#00d4ff','#ff6b00','#a371f7','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444'];
+const colors = ['#00ff88','#00d4ff','#ff6b00','#a371f7','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#ef4444','#06b6d4','#a855f7','#10b981','#f43f5e','#0ea5e9','#d946ef'];
 const container = document.getElementById('planes-container');
 
 for(let i=1;i<=PLANE_COUNT;i++){
@@ -205,24 +191,22 @@ for(let i=1;i<=PLANE_COUNT;i++){
     el.className = 'uav';
     el.id = 'U'+i;
     el.innerHTML = '🚁<div class=uav-id></div>';
-    const startX = 2 + Math.random()*12;
-    const startY = 40 + Math.random()*40;
-    const endX = 80 + Math.random()*15;
-    const endY = 15 + Math.random()*30;
-    const baseAlt = 300 + Math.random()*500;
+    const startX = 1 + Math.random()*10;
+    const startY = 35 + Math.random()*45;
+    const endX = 85 + Math.random()*12;
+    const endY = 10 + Math.random()*35;
+    const baseAlt = 350 + Math.random()*450;
     const color = colors[i % colors.length];
-    const speed = 40 + Math.random()*50;
-    el.style.background = `linear-gradient(135deg,${color},${color}99)`;
-    el.style.boxShadow = `0 0 20px ${color}aa`;
-    el.style.setProperty('--c', color);
-    el.querySelector('.uav-id').style.color = color;
+    const speed = 35 + Math.random()*45;
+    el.style.background = `linear-gradient(135deg,${color},${color}88)`;
+    el.style.boxShadow = `0 0 15px ${color}99`;
     el.style.left = startX+'%';
     el.style.top = startY+'%';
     container.appendChild(el);
     
     planes.push({
         el: el,
-        id: 'EVTOL-'+String(i).padStart(2,'0'),
+        id: 'E'+(i<10?'0'+i:i),
         start: {x:startX,y:startY},
         end: {x:endX,y:endY},
         baseAlt: baseAlt,
@@ -235,8 +219,7 @@ let F=false,Pf=false,Ani;
 function startAll(){
     if(F&&!Pf)return;
     F=true;Pf=false;
-    document.getElementById('bp').disabled=false;
-    Ani=setInterval(update,60);
+    Ani=setInterval(update,40);
 }
 function pauseAll(){
     if(!F)return;
@@ -256,13 +239,13 @@ function update(){
     if(!F||Pf)return;
     let totalAlt=0,totalSpeed=0;
     planes.forEach((p,i)=>{
-        p.progress+=0.0015;
+        p.progress+=0.001;
         if(p.progress>1)p.progress=0;
         const x = p.start.x + (p.end.x-p.start.x)*p.progress;
-        const y = p.start.y + (p.end.y-p.start.y)*p.progress + Math.sin(p.progress*Math.PI)*12;
+        const y = p.start.y + (p.end.y-p.start.y)*p.progress + Math.sin(p.progress*Math.PI)*10;
         p.el.style.left = x+'%';
         p.el.style.top = y+'%';
-        const h = Math.round(p.baseAlt + Math.sin(p.progress*Math.PI)*250);
+        const h = Math.round(p.baseAlt + Math.sin(p.progress*Math.PI)*200);
         p.el.querySelector('.uav-id').textContent = h+'m';
         totalAlt+=h;
         totalSpeed+=p.speed;
@@ -275,18 +258,12 @@ function update(){
     document.getElementById('ac').textContent = PLANE_COUNT;
     document.getElementById('aa').textContent = avgAlt+' m';
     document.getElementById('as').textContent = avgSpeed+' km/h';
-    document.getElementById('fl').textContent = Math.floor(Math.random()*800)+200;
     document.getElementById('fa').textContent = PLANE_COUNT;
-    document.getElementById('ff').textContent = Math.floor(Math.random()*800)+200;
+    document.getElementById('ff').textContent = Math.floor(Math.random()*1000)+500;
+    document.getElementById('prog').style.width = (avgAlt/1000*100)+'%';
 }
 function updateUI(){
-    document.getElementById('c1').textContent = '0';
-    document.getElementById('c2').textContent = '0';
-    document.getElementById('c3').textContent = '0';
-    document.getElementById('ac').textContent = '0';
-    document.getElementById('aa').textContent = '0 m';
-    document.getElementById('as').textContent = '0 km/h';
-    document.getElementById('fa').textContent = '0';
+    ['c1','c2','c3','ac','aa','as','fa','ff'].forEach(id=>document.getElementById(id).textContent='0');
 }
 function T(){
     const n=new Date,h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
