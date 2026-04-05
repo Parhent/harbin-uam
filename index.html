@@ -3,161 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏙️ 哈尔滨3D城市</title>
+<title>🏙️ 哈尔滨3D</title>
 <style>
 * {margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;-webkit-user-select:none}
-html,body {height:100%;overflow:hidden;background:#000;touch-action:none}
-#map {position:fixed;inset:0;background:#0a1220;overflow:hidden}
-#canvas {width:100%;height:100%}
-#ui {position:fixed;top:0;left:0;right:0;padding:10px;background:linear-gradient(180deg,rgba(0,0,0,0.9),transparent);z-index:10;display:flex;justify-content:space-between;align-items:center}
-.title {font-size:14px;font-weight:bold;color:#00d4ff}
-#joystick {position:fixed;bottom:25px;left:25px;width:90px;height:90px;background:rgba(255,255,255,0.06);border:2px solid rgba(0,212,255,0.35);border-radius:50%;z-index:10}
-#knob {width:36px;height:36px;background:linear-gradient(135deg,#00d4ff,#006688);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(0,212,255,0.7)}
-#zoom {position:fixed;bottom:25px;right:25px;z-index:10;display:flex;flex-direction:column;gap:10px}
-.zbtn {width:44px;height:44px;background:rgba(0,212,255,0.12);border:2px solid #00d4ff;border-radius:10px;color:#00d4ff;font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center}
-#mini {position:fixed;bottom:130px;right:25px;width:70px;height:70px;background:rgba(0,0,0,0.75);border:2px solid #00d4ff;border-radius:8px;z-index:10;overflow:hidden}
-.mp {width:6px;height:6px;background:#00ff88;border-radius:50%;position:absolute;box-shadow:0 0 5px #00ff88}
+html,body {height:100%;overflow:hidden;background:#080c14;touch-action:none}
+#c {position:fixed;inset:0}
+#ui {position:fixed;top:0;left:0;right:0;padding:10px;background:linear-gradient(180deg,rgba(0,0,0,0.85),transparent);z-index:10;font-size:13px;color:#00d4ff;font-weight:bold}
+#j {position:fixed;bottom:20px;left:20px;width:80px;height:80px;background:rgba(255,255,255,0.05);border:2px solid rgba(0,200,255,0.3);border-radius:50%;z-index:10}
+#k {width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#0088aa);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #00d4ff}
+#z {position:fixed;bottom:20px;right:20px;z-index:10;display:flex;flex-direction:column;gap:8px}
+.b {width:38px;height:38px;background:rgba(0,200,255,0.1);border:2px solid #00d4ff;border-radius:8px;color:#00d4ff;font-size:18px;font-weight:bold;display:flex;align-items:center;justify-content:center}
+#m {position:fixed;bottom:115px;right:20px;width:60px;height:60px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:6px;z-index:10;overflow:hidden}
+.p {width:5px;height:5px;background:#00ff88;border-radius:50%;position:absolute;box-shadow:0 0 4px #00ff88}
 </style>
 </head>
 <body>
-<div id="map"><canvas id="canvas"></canvas></div>
-<div id="ui"><div class="title">🏙️ 哈尔滨3D城市</div></div>
-<div id="joystick"><div id="knob"></div></div>
-<div id="zoom"><div class="zbtn" id="zin">+</div><div class="zbtn" id="zout">-</div></div>
-<div id="mini"><div class="mp"></div></div>
-
+<canvas id="c"></canvas>
+<div id="ui">🏙️ 哈尔滨3D - 拖动摇杆移动</div>
+<div id="j"><div id="k"></div></div>
+<div id="z"><div class="b" id="zi">+</div><div class="b" id="zo">-</div></div>
+<div id="m"><div class="p"></div></div>
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const mp = document.querySelector('.mp');
-const joystick = document.getElementById('joystick');
-const knob = document.getElementById('knob');
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H;function rs(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}rs();window.onresize=rs;
 
-let W,H;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-resize();window.onresize=resize;
+const cam={x:0,y:0,z:0,rx:0.7,ry:0,rz:0,zoom:1};
+const buildings=[
+{x:-40,z:-60,w:36,h:55,c:'#d4c4a8'},{x:-22,z:-42,w:40,h:85,c:'#2a3a4a'},{x:8,z:-32,w:34,h:70,c:'#3a2a1a'},{x:48,z:-80,w:48,h:75,c:'#8a5a4a'},{x:66,z:-90,w:44,h:100,c:'#2a3a4a'},{x:178,z:-30,w:120,h:45,c:'#6a5a4a'},{x:0,z:75,w:28,h:28,c:'#8a6a5a'},{x:-150,z:45,w:50,h:40,c:'#3a4a5a'},{x:-180,z:25,w:40,h:90,c:'#1a3a5a'},{x:-120,z:65,w:45,h:110,c:'#2a3a4a'},{x:215,z:-120,w:160,h:50,c:'#4a5a6a'},{x:185,z:-148,w:85,h:70,c:'#8a3a4a'},{x:95,z:-20,w:28,h:200,c:'#c9a86c'},{x:75,z:-10,w:40,h:90,c:'#3a4a5a'},{x:55,z:-5,w:45,h:130,c:'#2a3a4a'},{x:-80,z:175,w:350,h:8,c:'#2a6a3a'},{x:-250,z:-50,w:150,h:45,c:'#3a4a5a'},{x:-280,z:-30,w:42,h:60,c:'#4a5a6a'}];
+const verts=[];
 
-const buildings = [
-{x:-40,z:-60,w:36,h:60,color:'#d4c4a8',n:'索菲亚教堂'},
-{x:-22,z:-42,w:42,h:90,color:'#3a4a5a',n:'曼哈顿商厦'},
-{x:8,z:-32,w:36,h:75,color:'#4a3a2a',n:'金安欧罗巴'},
-{x:48,z:-82,w:52,h:80,color:'#8a5a4a',n:'秋林公司'},
-{x:68,z:-92,w:48,h:105,color:'#3a4a5a',n:'秋林国际'},
-{x:178,z:-32,w:135,h:48,color:'#6a5a4a',n:'哈尔滨站'},
-{x:0,z:78,w:32,h:32,color:'#8a6a5a',n:'防洪纪念塔'},
-{x:-152,z:48,w:58,h:42,color:'#3a4a5a',n:'群力政府'},
-{x:-182,z:28,w:44,h:95,color:'#1a3a5a',n:'哈尔滨银行'},
-{x:-122,z:68,w:48,h:115,color:'#2a3a4a',n:'盛和天下'},
-{x:218,z:-122,w:175,h:52,color:'#4a5a6a',n:'哈尔滨西站'},
-{x:188,z:-152,w:95,h:75,color:'#8a3a4a',n:'万达广场'},
-{x:98,z:-22,w:32,h:210,color:'#c9a86c',n:'龙塔'},
-{x:78,z:-12,w:44,h:95,color:'#3a4a5a',n:'长江大厦'},
-{x:58,z:-8,w:50,h:138,color:'#2a3a4a',n:'华润大厦'},
-{x:-82,z:178,w:390,h:10,color:'#2a6a3a',n:'太阳岛'},
-{x:-252,z:-52,w:165,h:48,color:'#3a4a5a',n:'科技创新城'},
-];
+function hex(c){
+const h=c.replace('#','');
+return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];
+}
 
-const iso = 0.5;
-let camX=0, camZ=0, rot=0, zoom=1.2, pitch=0.8;
-
-function isoX(x,z){return (x-z)*iso}
-function isoZ(x,z){return (x+z)*iso*pitch}
+function project(x,y,z){
+let p=[x-cam.x,y-cam.y,z-cam.z];
+let yz=p[1]*Math.cos(cam.rz)-p[2]*Math.sin(cam.rz);
+let xz=p[1]*Math.sin(cam.rz)+p[2]*Math.cos(cam.rz);
+let xy=p[0]*Math.cos(cam.ry)-xz*Math.sin(cam.ry);
+let zz=p[0]*Math.sin(cam.ry)+xz*Math.cos(cam.ry);
+let tyz=yz*Math.cos(cam.rx)-zz*Math.sin(cam.rx);
+let zyz=yz*Math.sin(cam.rx)+zz*Math.cos(cam.rx);
+if(tyz<10)return null;
+return[W/2+xy*cam.zoom*800/tyz,H/2+yz*cam.zoom*800/tyz,tyz];
+}
 
 function draw(){
-ctx.fillStyle='#0a1220';
-ctx.fillRect(0,0,W,H);
-ctx.save();
-ctx.translate(W/2 - camX*zoom, H/2 - camZ*zoom);
+ctx.fillStyle='#080c14';ctx.fillRect(0,0,W,H);
 
-// 地面
-ctx.strokeStyle='rgba(30,80,120,0.3)';
-ctx.lineWidth=1;
-for(let i=-20;i<=20;i++){
-ctx.beginPath();ctx.moveTo(isoX(i*20,-400),isoZ(i*20,-400));ctx.lineTo(isoX(i*20,400),isoZ(i*20,400));ctx.stroke();
-ctx.beginPath();ctx.moveTo(isoX(-400,i*20),isoZ(-400,i*20));ctx.lineTo(isoX(400,i*20),isoZ(400,i*20));ctx.stroke();
+// 地面网格
+for(let i=-15;i<=15;i++){
+let a=project(-300,i*40,0),b=project(300,i*40,0);
+if(a&&b){ctx.strokeStyle='rgba(30,60,90,0.2)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+let c=project(i*40,0,-300),d=project(i*40,0,300);
+if(c&&d){ctx.beginPath();ctx.moveTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.stroke();}
 }
 
-// 建筑排序
-const sorted = [...buildings].sort((a,b)=>(a.x+a.z)-(b.x+b.z));
-sorted.forEach(b=>{
-const bx = isoX(b.x,b.z)*zoom;
-const bz = isoZ(b.x,b.z)*zoom;
-const bw = b.w*zoom*iso*2;
-const bh = b.h*zoom;
-
-// 侧面（暗）
-ctx.fillStyle=shade(b.color,-40);
-ctx.beginPath();
-ctx.moveTo(bx+bw/2,bz);
-ctx.lineTo(bx+bw,bz-bh*0.3);
-ctx.lineTo(bx+bw,bz-bh*0.3+bw*0.5);
-ctx.lineTo(bx+bw/2,bz+bw*0.5);
-ctx.closePath();
-ctx.fill();
-
+// 建筑
+const polys=[];
+buildings.forEach(b=>{
+const hw=b.w/2,hh=b.h;
 // 正面
-ctx.fillStyle=b.color;
-ctx.beginPath();
-ctx.moveTo(bx-bw/2,bz);
-ctx.lineTo(bx+bw/2,bz);
-ctx.lineTo(bx+bw,bz-bh*0.3);
-ctx.lineTo(bx,bz-bh*0.3-bw/2);
-ctx.closePath();
-ctx.fill();
-
+polys.push({z:project(b.x+hw,b.z,0)?.[2]||0,v:[[b.x-hw,0,b.z],[b.x+hw,0,b.z],[b.x+hw,hh,b.z],[b.x-hw,hh,b.z]],c:b.c,t:'front'});
 // 顶面
-ctx.fillStyle=shade(b.color,30);
-ctx.beginPath();
-ctx.moveTo(bx,bz-bh*0.3-bw/2);
-ctx.lineTo(bx+bw/2,bz-bh*0.3);
-ctx.lineTo(bx,bz-bh*0.3-bw);
-ctx.lineTo(bx-bw/2,bz-bh*0.3);
-ctx.closePath();
-ctx.fill();
-
-// 窗户
-if(b.h>50){
-ctx.fillStyle='rgba(255,250,200,0.4)';
-for(let wy=0.2;wy<0.8;wy+=0.2){
-for(let wx=-0.3;wx<=0.3;wx+=0.2){
-ctx.fillRect(bx+wx*bw*0.5,bz-bh*0.3*wy-bw*0.15,bw*0.1,bw*0.1);
-}}
-}
+polys.push({z:project(b.x,b.z,b.h+5)?.[2]||0,v:[[b.x-hw,hh,b.z],[b.x+hw,hh,b.z],[b.x,hh,b.z+hw],[b.x,hh,b.z-hw]],c:b.c,t:'top'});
+// 右侧
+polys.push({z:project(b.x+hw,b.z+hw,0)?.[2]||0,v:[[b.x+hw,0,b.z-hw],[b.x+hw,0,b.z+hw],[b.x+hw,hh,b.z+hw],[b.x+hw,hh,b.z-hw]],c:b.c,t:'right'});
 });
-ctx.restore();
+polys.sort((a,b)=>b.z-a.z);
+polys.forEach(p=>{
+const av=p.v.map(v=>project(v[0],v[1],v[2])).filter(v=>v);
+if(av.length<3)return;
+let rgb=hex(p.c);
+if(p.t==='front')rgb=rgb.map(x=>Math.floor(x*0.9));
+if(p.t==='right')rgb=rgb.map(x=>Math.floor(x*0.65));
+if(p.t==='top')rgb=rgb.map(x=>Math.min(255,Math.floor(x*1.15)));
+ctx.fillStyle=`rgb(${rgb.join(',')})`;
+ctx.beginPath();ctx.moveTo(av[0][0],av[0][1]);
+av.slice(1).forEach(v=>ctx.lineTo(v[0],v[1]));ctx.closePath();ctx.fill();
+});
 requestAnimationFrame(draw);
 }draw();
 
-function shade(c,p){
-const h=c.replace('#','');
-const r=Math.max(0,Math.min(255,parseInt(h.substr(0,2),16)+p));
-const g=Math.max(0,Math.min(255,parseInt(h.substr(2,2),16)+p));
-const b=Math.max(0,Math.min(255,parseInt(h.substr(4,2),16)+p));
-return `rgb(${r},${g},${b})`;
-}
-
-let jx=0,jy=0,touch=false;
-joystick.addEventListener('touchstart',e=>{touch=true;e.preventDefault()});
-joystick.addEventListener('touchmove',e=>{
-if(!touch)return;
-const t=e.touches[0],r=joystick.getBoundingClientRect();
-let dx=t.clientX-r.left-45,dy=t.clientY-r.top-45;
-const d=Math.min(35,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(dy,dx);
-jx=Math.cos(a)*d/35; jy=Math.sin(a)*d/35;
-knob.style.transform=`translate(calc(-50%+${jx*30}px),calc(-50%+${jy*30}px))`;
+let jx=0,jy=0,t=false;
+document.getElementById('j').addEventListener('touchstart',e=>{t=true;e.preventDefault()});
+document.getElementById('j').addEventListener('touchmove',e=>{
+if(!t)return;
+const g=e.touches[0],r=document.getElementById('j').getBoundingClientRect();
+let dx=g.clientX-r.left-40,dy=g.clientY-r.top-40;
+const d=Math.min(30,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(dy,dx);
+jx=Math.cos(a)*d/30;jy=Math.sin(a)*d/30;
+document.getElementById('k').style.transform=`translate(calc(-50%+${jx*25}px),calc(-50%+${jy*25}px))`;
 e.preventDefault();
 });
-joystick.addEventListener('touchend',()=>{touch=false;jx=0;jy=0;knob.style.transform='translate(-50%,-50%)'});
+document.getElementById('j').addEventListener('touchend',()=>{t=false;jx=0;jy=0;document.getElementById('k').style.transform='translate(-50%,-50%)'});
+document.getElementById('zi').ontouchstart=()=>cam.zoom=Math.min(2.5,cam.zoom+0.15);
+document.getElementById('zo').ontouchstart=()=>cam.zoom=Math.max(0.5,cam.zoom-0.15);
 
-document.getElementById('zin').ontouchstart=()=>zoom=Math.max(0.5,zoom-0.2);
-document.getElementById('zout').ontouchstart=()=>zoom=Math.min(3,zoom+0.2);
-
-function update(){
-camX+=jx*5;camZ+=jy*5;
-camX=Math.max(-300,Math.min(300,camX));camZ=Math.max(-300,Math.min(300,camZ));
-mp.style.left=(50+camX/6)+'%';mp.style.top=(50+camZ/6)+'%';
-requestAnimationFrame(update);
-}update();
+setInterval(()=>{
+cam.x+=jx*4;cam.z+=jy*4;
+cam.x=Math.max(-250,Math.min(250,cam.x));cam.z=Math.max(-250,Math.min(250,cam.z));
+document.querySelector('.p').style.left=(50+cam.x/5)+'%';document.querySelector('.p').style.top=(50+cam.z/5)+'%';
+},16);
 </script>
 </body>
 </html>
