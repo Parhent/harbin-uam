@@ -1,0 +1,390 @@
+/* ===== 基础重置 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #00d4ff;
+    --secondary: #7c3aed;
+    --success: #00ff88;
+    --warning: #ff6b00;
+    --danger: #ff3366;
+    --dark-bg: #0a0e17;
+    --panel-bg: rgba(10, 20, 40, 0.85);
+    --text-primary: #e0f4ff;
+    --text-secondary: #8899aa;
+    --border-color: rgba(0, 212, 255, 0.3);
+    --glow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+body {
+    font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ===== 应用容器 ===== */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 50%),
+        var(--dark-bg);
+}
+
+/* ===== 头部 ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: linear-gradient(180deg, rgba(10, 20, 40, 0.95) 0%, rgba(10, 20, 40, 0.7) 100%);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 0 10px var(--primary));
+}
+
+.logo-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+}
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: 20px;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.online {
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.time-display {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    color: var(--primary);
+    letter-spacing: 3px;
+}
+
+/* ===== 主地图区域 ===== */
+.map-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* 地图自定义样式覆盖 */
+.leaflet-container {
+    background: #0a0e17;
+}
+
+/* ===== 浮动面板 ===== */
+.flight-info-panel,
+.dispatch-panel {
+    position: absolute;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    box-shadow: var(--glow);
+    z-index: 1000;
+}
+
+.flight-info-panel {
+    top: 20px;
+    right: 20px;
+    width: 220px;
+    padding: 16px;
+}
+
+.dispatch-panel {
+    bottom: 20px;
+    right: 20px;
+    width: 280px;
+    padding: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.panel-icon {
+    font-size: 18px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.info-row .label {
+    color: var(--text-secondary);
+}
+
+.info-row .value {
+    color: var(--primary);
+    font-family: 'Orbitron', monospace;
+}
+
+.info-row .value.status {
+    color: var(--warning);
+}
+
+/* ===== 调度面板 ===== */
+.route-info {
+    margin-bottom: 16px;
+}
+
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0, 212, 255, 0.05);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.point-icon {
+    font-size: 16px;
+}
+
+.route-line {
+    height: 20px;
+    margin-left: 14px;
+    border-left: 2px dashed var(--border-color);
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #0099cc);
+    color: #000;
+}
+
+.btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(124, 58, 237, 0.3);
+    color: var(--text-primary);
+    border: 1px solid var(--secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: rgba(124, 58, 237, 0.5);
+}
+
+.btn-warning {
+    background: rgba(255, 107, 0, 0.2);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: rgba(255, 107, 0, 0.4);
+}
+
+/* ===== 高度层图例 ===== */
+.altitude-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 18px;
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+}
+
+.legend-title {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.color-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+
+/* ===== 底部状态栏 ===== */
+.footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 24px;
+    background: rgba(10, 20, 40, 0.9);
+    border-top: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.footer-item .label {
+    color: var(--text-secondary);
+}
+
+.footer-item .value {
+    color: var(--primary);
+    font-family: 'Orbitron', monospace;
+}
+
+.status-ok {
+    color: var(--success) !important;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .flight-info-panel,
+    .dispatch-panel {
+        width: calc(100% - 40px);
+        left: 20px;
+    }
+    
+    .flight-info-panel {
+        top: 70px;
+    }
+    
+    .dispatch-panel {
+        bottom: 70px;
+    }
+    
+    .altitude-legend {
+        display: none;
+    }
+}
+
+/* ===== 自定义地图标记 ===== */
+.uav-marker {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px var(--primary);
+    animation: uav-pulse 1.5s infinite;
+}
+
+@keyframes uav-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 20px var(--primary); }
+    50% { transform: scale(1.1); box-shadow: 0 0 30px var(--primary); }
+    100% { transform: scale(1); box-shadow: 0 0 20px var(--primary); }
+}
+
+.waypoint-marker {
+    width: 20px;
+    height: 20px;
+    background: var(--secondary);
+    border: 2px solid #fff;
+    border-radius: 50%;
+}
+
+/* ===== 航线路径样式 ===== */
+.flight-path {
+    stroke-dasharray: 10, 5;
+    animation: dash 20s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -1000;
+    }
+}

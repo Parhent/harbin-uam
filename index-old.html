@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哈尔滨空中交通数字孪生系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部标题栏 -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🚁</span>
+                <span class="logo-text">Harbin UAM</span>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator online"></div>
+                <span>系统在线</span>
+            </div>
+            <div class="time-display" id="systemTime">00:00:00</div>
+        </header>
+
+        <!-- 主地图区域 -->
+        <main class="map-container">
+            <div id="map"></div>
+            
+            <!-- 飞行信息面板 -->
+            <div class="flight-info-panel" id="flightPanel">
+                <div class="panel-header">
+                    <span class="panel-icon">✈️</span>
+                    <span>飞行状态</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">飞行器ID:</span>
+                    <span class="value" id="vehicleId">EVTOL-001</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">当前高度:</span>
+                    <span class="value" id="altitude">0 m</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">飞行速度:</span>
+                    <span class="value" id="speed">0 km/h</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">剩余里程:</span>
+                    <span class="value" id="remaining">0 km</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">状态:</span>
+                    <span class="value status" id="flightStatus">待起飞</span>
+                </div>
+            </div>
+
+            <!-- 调度面板 -->
+            <div class="dispatch-panel" id="dispatchPanel">
+                <div class="panel-header">
+                    <span class="panel-icon">🎯</span>
+                    <span>调度控制</span>
+                </div>
+                <div class="route-info">
+                    <div class="route-point">
+                        <span class="point-icon">🏁</span>
+                        <span>起点: 防洪纪念塔</span>
+                    </div>
+                    <div class="route-line"></div>
+                    <div class="route-point">
+                        <span class="point-icon">🎭</span>
+                        <span>终点: 哈尔滨大剧院</span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" id="btnStart" onclick="startFlight()">
+                        <span>▶</span> 起飞
+                    </button>
+                    <button class="btn btn-secondary" id="btnPause" onclick="pauseFlight()" disabled>
+                        <span>⏸</span> 暂停
+                    </button>
+                    <button class="btn btn-warning" id="btnReset" onclick="resetFlight()">
+                        <span>↺</span> 重置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 高度层图例 -->
+            <div class="altitude-legend">
+                <div class="legend-title">高度层 (m)</div>
+                <div class="legend-item">
+                    <span class="color-box" style="background: #00ff88;"></span>
+                    <span>低空 (0-100)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="color-box" style="background: #00aaff;"></span>
+                    <span>中空 (100-300)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="color-box" style="background: #ff6b00;"></span>
+                    <span>高空 (300+)</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部状态栏 -->
+        <footer class="footer">
+            <div class="footer-item">
+                <span class="label">活跃飞行器:</span>
+                <span class="value" id="activeCount">0</span>
+            </div>
+            <div class="footer-item">
+                <span class="label">今日航班:</span>
+                <span class="value" id="todayFlights">0</span>
+            </div>
+            <div class="footer-item">
+                <span class="label">空域状态:</span>
+                <span class="value status-ok" id="airspaceStatus">畅通</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

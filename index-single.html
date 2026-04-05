@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哈尔滨空中交通数字孪生系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" />
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --primary: #00d4ff; --secondary: #7c3aed; --success: #00ff88; --warning: #ff6b00; --danger: #ff3366; --dark-bg: #0a0e17; --panel-bg: rgba(10, 20, 40, 0.85); --text-primary: #e0f4ff; --text-secondary: #8899aa; --border-color: rgba(0, 212, 255, 0.3); }
+body { font-family: 'Noto Sans SC', sans-serif; background: var(--dark-bg); color: var(--text-primary); overflow: hidden; height: 100vh; }
+.app-container { display: flex; flex-direction: column; height: 100vh; background: radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 50%), var(--dark-bg); }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: linear-gradient(180deg, rgba(10, 20, 40, 0.95) 0%, rgba(10, 20, 40, 0.7) 100%); border-bottom: 1px solid var(--border-color); z-index: 1000; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { font-size: 24px; filter: drop-shadow(0 0 10px var(--primary)); }
+.logo-text { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.system-status { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 20px; font-size: 12px; }
+.status-indicator { width: 8px; height: 8px; border-radius: 50%; background: #00ff88; box-shadow: 0 0 10px #00ff88; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.time-display { font-family: 'Orbitron', monospace; font-size: 14px; color: var(--primary); }
+.map-container { flex: 1; position: relative; }
+#map { width: 100%; height: 100%; }
+.leaflet-container { background: #0a0e17; }
+.flight-info-panel, .dispatch-panel { position: absolute; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(15px); z-index: 1000; padding: 12px; }
+.flight-info-panel { top: 10px; right: 10px; width: 180px; }
+.dispatch-panel { bottom: 10px; right: 10px; width: 220px; }
+.panel-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); font-weight: 500; font-size: 13px; }
+.info-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+.info-row .label { color: var(--text-secondary); }
+.info-row .value { color: var(--primary); font-family: 'Orbitron', monospace; }
+.route-info { margin-bottom: 10px; }
+.route-point { display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(0, 212, 255, 0.05); border-radius: 6px; font-size: 11px; }
+.route-line { height: 12px; margin-left: 10px; border-left: 2px dashed var(--border-color); }
+.controls { display: flex; gap: 6px; }
+.btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), #0099cc); color: #000; }
+.btn-secondary { background: rgba(124, 58, 237, 0.3); color: var(--text-primary); border: 1px solid var(--secondary); }
+.btn-warning { background: rgba(255, 107, 0, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+.altitude-legend { position: absolute; bottom: 10px; left: 10px; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; z-index: 1000; }
+.legend-title { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; margin-bottom: 4px; }
+.color-box { width: 12px; height: 12px; border-radius: 2px; }
+.footer { display: flex; justify-content: space-around; padding: 8px 16px; background: rgba(10, 20, 40, 0.9); border-top: 1px solid var(--border-color); }
+.footer-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.footer-item .label { color: var(--text-secondary); }
+.footer-item .value { color: var(--primary); font-family: 'Orbitron', monospace; }
+.status-ok { color: var(--success) !important; }
+@media (max-width: 600px) { .flight-info-panel, .dispatch-panel { width: calc(100% - 20px); left: 10px; } .flight-info-panel { top: 60px; } .dispatch-panel { bottom: 50px; } .altitude-legend { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo"><span class="logo-icon">🚁</span><span class="logo-text">Harbin UAM</span></div>
+            <div class="system-status"><div class="status-indicator"></div><span>系统在线</span></div>
+            <div class="time-display" id="systemTime">00:00:00</div>
+        </header>
+        <main class="map-container">
+            <div id="map"></div>
+            <div class="flight-info-panel">
+                <div class="panel-header"><span>✈️</span><span>飞行状态</span></div>
+                <div class="info-row"><span class="label">飞行器ID:</span><span class="value" id="vehicleId">EVTOL-001</span></div>
+                <div class="info-row"><span class="label">当前高度:</span><span class="value" id="altitude">0 m</span></div>
+                <div class="info-row"><span class="label">飞行速度:</span><span class="value" id="speed">0 km/h</span></div>
+                <div class="info-row"><span class="label">剩余里程:</span><span class="value" id="remaining">0 km</span></div>
+                <div class="info-row"><span class="label">状态:</span><span class="value" id="flightStatus">待起飞</span></div>
+            </div>
+            <div class="dispatch-panel">
+                <div class="panel-header"><span>🎯</span><span>调度控制</span></div>
+                <div class="route-info">
+                    <div class="route-point"><span>🏁</span><span>起点: 防洪纪念塔</span></div>
+                    <div class="route-line"></div>
+                    <div class="route-point"><span>🎭</span><span>终点: 哈尔滨大剧院</span></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" id="btnStart" onclick="startFlight()">▶ 起飞</button>
+                    <button class="btn btn-secondary" id="btnPause" onclick="pauseFlight()" disabled>⏸ 暂停</button>
+                    <button class="btn btn-warning" id="btnReset" onclick="resetFlight()">↺ 重置</button>
+                </div>
+            </div>
+            <div class="altitude-legend">
+                <div class="legend-title">高度层 (m)</div>
+                <div class="legend-item"><span class="color-box" style="background:#00ff88"></span><span>低空 (0-100)</span></div>
+                <div class="legend-item"><span class="color-box" style="background:#00aaff"></span><span>中空 (100-300)</span></div>
+                <div class="legend-item"><span class="color-box" style="background:#ff6b00"></span><span>高空 (300+)</span></div>
+            </div>
+        </main>
+        <footer class="footer">
+            <div class="footer-item"><span class="label">活跃飞行器:</span><span class="value" id="activeCount">0</span></div>
+            <div class="footer-item"><span class="label">今日航班:</span><span class="value" id="todayFlights">0</span></div>
+            <div class="footer-item"><span class="label">空域状态:</span><span class="value status-ok" id="airspaceStatus">畅通</span></div>
+        </footer>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+let map, uavMarker, pathPolyline, flightPath = [], animationId, isFlying = false, isPaused = false, progress = 0, currentAltitude = 0, currentSpeed = 0;
+const CONFIG = { startPoint: { lat: 45.7755, lng: 126.5840, name: "防洪纪念塔" }, endPoint: { lat: 45.8180, lng: 126.5600, name: "哈尔滨大剧院" }, totalDistance: 0, avgSpeed: 80, maxAltitude: 200, minAltitude: 50, animationDuration: 15000, updateInterval: 50 };
+function initMap() {
+    map = L.map('map', { center: [45.7850, 126.5700], zoom: 13, zoomControl: false, attributionControl: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+    CONFIG.totalDistance = calculateDistance(CONFIG.startPoint.lat, CONFIG.startPoint.lng, CONFIG.endPoint.lat, CONFIG.endPoint.lng);
+    addWaypoints(); initFlightPath(); initUAVMarker();
+    updateSystemTime(); setInterval(updateSystemTime, 1000);
+}
+function addWaypoints() {
+    const startIcon = L.divIcon({ className: 'custom-marker', html: '<div style="width:36px;height:36px;background:linear-gradient(135deg,#00d4ff,#7c3aed);border-radius:50%;border:3px solid #fff;box-shadow:0 0 15px rgba(0,212,255,0.6);display:flex;align-items:center;justify-content:center;font-size:16px;">🏁</div>', iconSize: [36,36], iconAnchor: [18,18] });
+    L.marker([CONFIG.startPoint.lat, CONFIG.startPoint.lng], {icon:startIcon}).addTo(map).bindPopup('<div style="color:#000;padding:5px;"><b>起点</b><br>'+CONFIG.startPoint.name+'</div>');
+    const endIcon = L.divIcon({ className: 'custom-marker', html: '<div style="width:36px;height:36px;background:linear-gradient(135deg,#ff6b00,#ff3366);border-radius:50%;border:3px solid #fff;box-shadow:0 0 15px rgba(255,107,0,0.6);display:flex;align-items:center;justify-content:center;font-size:16px;">🎭</div>', iconSize: [36,36], iconAnchor: [18,18] });
+    L.marker([CONFIG.endPoint.lat, CONFIG.endPoint.lng], {icon:endIcon}).addTo(map).bindPopup('<div style="color:#000;padding:5px;"><b>终点</b><br>'+CONFIG.endPoint.name+'</div>');
+    const waypoints = [{lat:45.7900,lng:126.5750,name:"航路点A"},{lat:45.8000,lng:126.5680,name:"航路点B"},{lat:45.8100,lng:126.5620,name:"航路点C"}];
+    waypoints.forEach(wp => { const wpIcon = L.divIcon({html:'<div style="width:16px;height:16px;background:rgba(124,58,237,0.6);border:2px solid rgba(124,58,237,0.8);border-radius:50%;"></div>',iconSize:[16,16],iconAnchor:[8,8]}); L.marker([wp.lat,wp.lng],{icon:wpIcon}).addTo(map).bindPopup('<div style="color:#000;">'+wp.name+'</div>'); });
+}
+function initFlightPath() {
+    const start = [CONFIG.startPoint.lat, CONFIG.startPoint.lng], end = [CONFIG.endPoint.lat, CONFIG.endPoint.lng], midLat = (start[0]+end[0])/2, midLng = (start[1]+end[1])/2;
+    flightPath = [start, [midLat-0.003,midLng+0.002], [midLat+0.002,midLng-0.003], [midLat+0.005,midLng+0.001], end];
+    pathPolyline = L.polyline(flightPath,{color:'#00d4ff',weight:3,opacity:0.6,dashArray:'10,5',lineCap:'round',lineJoin:'round'}).addTo(map);
+    map.fitBounds(pathPolyline.getBounds(),{padding:[50,50]});
+}
+function initUAVMarker() {
+    const uavIcon = L.divIcon({ className: 'uav-marker', html: '<div style="width:44px;height:44px;background:linear-gradient(135deg,#00ff88,#00d4ff);border-radius:50%;border:3px solid #fff;box-shadow:0 0 25px rgba(0,255,136,0.8);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;">🚁<div style="position:absolute;width:60px;height:60px;border:1px solid rgba(0,255,136,0.4);border-radius:50%;animation:ripple 2s infinite;"></div></div><style>@keyframes ripple{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.5);opacity:0}}</style>', iconSize: [44,44], iconAnchor: [22,22] });
+    uavMarker = L.marker([CONFIG.startPoint.lat, CONFIG.startPoint.lng],{icon:uavIcon,zIndexOffset:1000}).addTo(map).bindPopup('<div style="color:#000;"><b>EVTOL-001</b><br>准备起飞</div>').openPopup();
+}
+function calculateDistance(lat1,lng1,lat2,lng2) { const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180,a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2),c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
+function getPositionOnPath(p) { const totalSegments=flightPath.length-1,segmentProgress=p*totalSegments,segmentIndex=Math.min(Math.floor(segmentProgress),totalSegments-1),segmentLocalProgress=segmentProgress-segmentIndex,start=flightPath[segmentIndex],end=flightPath[segmentIndex+1],lat=start[0]+(end[0]-start[0])*segmentLocalProgress,lng=start[1]+(end[1]-start[1])*segmentLocalProgress; return{lat,lng}; }
+function getAltitude(p) { return CONFIG.minAltitude+(CONFIG.maxAltitude-CONFIG.minAltitude)*Math.sin(p*Math.PI); }
+function getSpeed(p) { if(p<0.1)return CONFIG.avgSpeed*(p/0.1); if(p>0.9)return CONFIG.avgSpeed*((1-p)/0.1); return CONFIG.avgSpeed; }
+function updateUI() { const remaining=CONFIG.totalDistance*(1-progress); document.getElementById('vehicleId').textContent='EVTOL-001'; document.getElementById('altitude').textContent=Math.round(currentAltitude)+' m'; document.getElementById('speed').textContent=Math.round(currentSpeed)+' km/h'; document.getElementById('remaining').textContent=remaining.toFixed(2)+' km'; const statusEl=document.getElementById('flightStatus'); if(isFlying&&!isPaused){statusEl.textContent=progress<0.1?'起飞中':progress>0.9?'降落中':'巡航中';statusEl.style.color='#00ff88';}else if(isPaused){statusEl.textContent='已暂停';statusEl.style.color='#ff6b00';}else{statusEl.textContent='待起飞';statusEl.style.color='#8899aa';} document.getElementById('activeCount').textContent=isFlying?'1':'0'; document.getElementById('todayFlights').textContent=isFlying?'1':'0'; }
+function startFlight() { if(isFlying&&!isPaused)return; if(isPaused){isPaused=false;document.getElementById('btnStart').disabled=true;document.getElementById('btnPause').disabled=false;animate();return;} isFlying=true;isPaused=false;progress=0;document.getElementById('btnStart').disabled=true;document.getElementById('btnPause').disabled=false;animate(); }
+function animate() { if(!isFlying||isPaused)return; progress+=CONFIG.updateInterval/CONFIG.animationDuration; if(progress>=1){progress=1;flightComplete();return;} currentPosition=getPositionOnPath(progress); currentAltitude=getAltitude(progress); currentSpeed=getSpeed(progress); uavMarker.setLatLng([currentPosition.lat,currentPosition.lng]); const status=progress<0.1?'起飞':progress>0.9?'降落':'巡航'; uavMarker.setPopupContent('<div style="color:#000;"><b>EVTOL-001</b><br>状态:'+status+'<br>高度:'+Math.round(currentAltitude)+'m<br>速度:'+Math.round(currentSpeed)+'km/h</div>'); updateUI(); animationId=setTimeout(animate,CONFIG.updateInterval); }
+function flightComplete() { isFlying=false;progress=1; uavMarker.setLatLng([CONFIG.endPoint.lat,CONFIG.endPoint.lng]); uavMarker.setPopupContent('<div style="color:#000;"><b>EVTOL-001</b><br>状态:已到达<br>终点:'+CONFIG.endPoint.name+'</div>').openPopup(); currentAltitude=0;currentSpeed=0;updateUI(); document.getElementById('btnStart').disabled=false;document.getElementById('btnStart').innerHTML='▶ 重新起飞';document.getElementById('btnPause').disabled=true; }
+function pauseFlight() { if(!isFlying)return; isPaused=true;clearTimeout(animationId); document.getElementById('btnStart').disabled=false;document.getElementById('btnStart').innerHTML='▶ 继续';document.getElementById('btnPause').disabled=true; }
+function resetFlight() { isFlying=false;isPaused=false;progress=0;clearTimeout(animationId); uavMarker.setLatLng([CONFIG.startPoint.lat,CONFIG.startPoint.lng]); uavMarker.setPopupContent('<div style="color:#000;"><b>EVTOL-001</b><br>准备起飞</div>'); currentAltitude=0;currentSpeed=0;updateUI(); document.getElementById('btnStart').disabled=false;document.getElementById('btnStart').innerHTML='▶ 起飞';document.getElementById('btnPause').disabled=true; }
+function updateSystemTime() { const now=new Date(),hours=String(now.getHours()).padStart(2,'0'),minutes=String(now.getMinutes()).padStart(2,'0'),seconds=String(now.getSeconds()).padStart(2,'0'); document.getElementById('systemTime').textContent=hours+':'+minutes+':'+seconds; }
+document.addEventListener('DOMContentLoaded',initMap);
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "harbin-uam",
+  "version": "1.0.0",
+  "description": "- 一个展示城市空中交通（UAM）调度的轻量级Web演示 - 包含：哈尔滨3D风格地图 + eVTOL航线模拟 + 路径规划可视化",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}
