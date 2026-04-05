@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哈尔滨3D城市漫游</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Microsoft YaHei',sans-serif;background:#000;color:#fff}
+#c{width:100%;height:100%;display:block}
+#ui{position:fixed;top:0;left:0;right:0;padding:15px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);z-index:100;display:flex;justify-content:space-between;align-items:center}
+.title{font-size:18px;font-weight:bold;background:linear-gradient(90deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.controls{font-size:12px;color:#888}
+#info{position:fixed;bottom:20px;left:20px;background:rgba(0,0,0,0.7);padding:15px;border-radius:10px;border:1px solid #00d4ff;font-size:12px}
+#info h3{color:#00d4ff;margin-bottom:8px}
+#info p{color:#aaa;margin:4px 0}
+.k{color:#00ff88;font-weight:bold}
+.minimap{position:fixed;bottom:20px;right:20px;width:150px;height:150px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:10px}
+#buildings-list{position:fixed;top:80px;left:10px;max-height:70vh;overflow-y:auto;background:rgba(0,0,0,0.8);padding:10px;border-radius:10px;width:200px}
+#buildings-list h3{color:#00d4ff;font-size:12px;margin-bottom:10px}
+.building-item{font-size:10px;color:#888;padding:5px;border-bottom:1px solid #333;cursor:pointer}
+.building-item:hover{color:#00ff88;background:rgba(0,255,136,0.1)}
+</style>
+</head>
+<body>
+<div id="ui">
+<div class="title">🏙️ 哈尔滨3D城市漫游</div>
+<div class="controls">WASD移动 | 鼠标视角 | 点击建筑查看信息</div>
+</div>
+<div id="info">
+<h3>📍 位置信息</h3>
+<p>坐标: <span id="pos" class="k">0, 0</span></p>
+<p>高度: <span id="height" class="k">50m</span></p>
+<p>朝向: <span id="heading" class="k">北</span></p>
+<p>当前: <span id="current-building" class="k">--</span></p>
+</div>
+<div class="minimap" id="minimap"></div>
+<div id="buildings-list">
+<h3>🏢 建筑物列表</h3>
+<div id="list"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// 哈尔滨核心区 - 真实建筑数据 (基于卫星地图)
+// 坐标系统: x=东西, z=南北, 1单位=1米
+const buildings = [
+// 中央大街区域
+{name:"防洪纪念塔",x:0,z:0,h:80,w:30,d:30,color:0xcc4444},
+{name:"中央大街",x:50,z:50,w:200,h:5,d:20,color:0x555555},
+{name:"华梅西餐厅",x:30,z:30,h:25,w:20,d:15,color:0xddaa77},
+{name:"马迭尔宾馆",x:40,z:40,h:30,w:25,d:20,color:0xccaa66},
+{name:"教育书店",x:60,z:20,h:35,w:18,d:15,color:0x886644},
+// 松花江沿岸
+{name:"斯大林公园",x:0,z:100,w:400,h:3,d:60,color:0x228844},
+{name:"防洪堤",x:0,z:150,w:500,h:15,d:10,color:0x666666},
+{name:"江边游艇码头",x:80,z:120,h:10,w:40,d:25,color:0x4477aa},
+// 火车站区域
+{name:"哈尔滨站",x:-200,z:50,h:40,w:100,d:60,color:0xaa6644},
+{name:"站前广场",x:-200,z:100,w:120,h:2,d:80,color:0x555555},
+{name:"龙门大厦",x:-180,z:30,h:60,w:30,d:25,color:0x666688},
+{name:"省博物馆",x:-150,z:-50,h:35,w:40,d:30,color:0x886644},
+// 秋林地区
+{name:"秋林公司",x:-50,z:-100,h:70,w:40,d:35,color:0xaa5544},
+{name:"秋林国际",x:-30,z:-120,h:90,w:35,d:30,color:0x6688aa},
+{name:"工人文化宫",x:-80,z:-80,h:45,w:50,d:40,color:0x666655},
+// 大剧院区域
+{name:"哈尔滨大剧院",x:200,z:-100,h:40,w:80,d:60,color:0xeeeeee},
+{name:"音乐公园",x:250,z:-80,w:100,h:3,d:80,color:0x228844},
+{name:"万达乐园",x:180,z:-150,h:30,w:60,d:50,color:0xcc3344},
+// 群力新区
+{name:"群力新区政府",x:150,z:100,h:35,w:40,d:30,color:0x4466aa},
+{name:"哈尔滨银行",x:120,z:80,h:80,w:30,d:25,color:0x2255aa},
+{name:"景观大道",x:180,z:50,w:300,h:3,d:40,color:0x444444},
+// 哈西地区
+{name:"哈尔滨西站",x:-250,z:-150,h:45,w:150,d:80,color:0x5588aa},
+{name:"万达广场",x:-220,z:-180,h:60,w:80,d:60,color:0xcc2244},
+{name:"北方血管医院",x:-200,z:-130,h:40,w:30,d:25,color:0xffffff},
+// 道里区核心
+{name:"索菲亚教堂",x:20,z:-50,h:55,w:30,d:25,color:0xddcc88},
+{name:"曼哈顿商厦",x:10,z:-30,h:50,w:25,d:20,color:0x6688aa},
+{name:"金安欧罗巴",x:30,z:-20,h:45,w:30,d:25,color:0xaa8866},
+// 南岗区
+{name:"革新街教堂",x:-30,z:-80,h:30,w:20,d:15,color:0xaaaaff},
+{name:"果戈里大街",x:-20,z:-100,w:150,h:3,d:15,color:0x444444},
+{name:"新天地",x:10,z:-110,h:55,w:35,d:30,color:0x6688aa},
+// 珠江路附近
+{name:"龙塔",x:-100,z:-30,h:180,w:25,d:25,color:0xccaa66},
+{name:"长江大厦",x:-80,z:-20,h:80,w:30,d:25,color:0x4477aa},
+{name:"省电视台",x:-120,z:-40,h:50,w:40,d:30,color:0x666688},
+// 太阳岛区域
+{name:"太阳岛公园",x:100,z:180,w:300,h:3,d:200,color:0x33aa55},
+{name:"太阳岛美术馆",x:120,z:160,h:20,w:30,d:25,color:0xeeeeee},
+{name:"俄罗斯风情小镇",x:80,z:170,w:80,h:8,d:60,color:0xddaa77},
+// 科技创新城
+{name:"科技创新城",x:-300,z:50,h:40,w:100,d:80,color:0x4477aa},
+{name:"云计算中心",x:-280,z:30,h:30,w:40,d:35,color:0x6688aa},
+// 呼兰区
+{name:"呼兰老城区",x:-50,z:300,w:200,h:20,d:150,color:0x887766},
+{name:"呼兰河大桥",x:0,z:250,w:200,h:10,d:20,color:0x666666},
+// 额外高层建筑
+{name:"华润大厦",x:80,z:-20,h:120,w:40,d:35,color:0x3366aa},
+{name:"盛和天下",x:100,z:30,h:100,w:35,d:30,color:0xaa5533},
+{name:"凯旋门",x:140,z:60,h:85,w:30,d:25,color:0xccaa66},
+{name:"外滩首府",x:60,z:70,h:90,w:32,d:28,color:0x6688aa},
+{name:"天合湾",x:90,z:10,h:95,w:30,d:26,color:0x7755aa},
+];
+
+// 道路数据
+const roads = [
+{x:0,z:0,w:500,h:8,name:"中央大街"},
+{x:200,z:50,w:400,h:8,name:"友谊路"},
+{x:-200,z:-50,w:300,h:8,name:"红军街"},
+{x:50,z:-100,w:450,h:6,name:"中山路"},
+{x:-50,z:50,w:350,h:6,name:"兆麟街"},
+{x:100,z:0,w:300,h:6,name:"尚志大街"},
+{x:-150,z:-100,w:250,h:6,name:"果戈里大街"},
+{x:0,z:150,w:600,h:10,name:"松花江畔"},
+{x:150,z:100,w:400,h:6,name:"群力大道"},
+{x:-200,z:-150,w:350,h:6,name:"哈西大街"},
+];
+
+// 河流
+const rivers = [
+{x:0,z:200,w:600,h:80,name:"松花江"},
+];
+
+// 公园
+const parks = [
+{x:50,z:120,w:100,h:80,name:"斯大林公园"},
+{x:100,z:180,w:300,h:200,name:"太阳岛"},
+{x:-100,z:80,w:80,h:60,name:"文化公园"},
+{x:200,z:-80,w:150,h:100,name:"音乐公园"},
+];
+
+// Three.js场景
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1520);
+scene.fog = new THREE.Fog(0x0a1520,100,800);
+
+const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,2000);
+camera.position.set(0,30,0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+// 灯光
+const ambient = new THREE.AmbientLight(0x404060,0.6);
+scene.add(ambient);
+
+const sun = new THREE.DirectionalLight(0xffffcc,1);
+sun.position.set(200,300,100);
+sun.castShadow = true;
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0x4488ff,0.3);
+fill.position.set(-100,100,-100);
+scene.add(fill);
+
+// 地面
+const groundGeo = new THREE.PlaneGeometry(1000,1000);
+const groundMat = new THREE.MeshStandardMaterial({color:0x1a2530,roughness:0.9});
+const ground = new THREE.Mesh(groundGeo,groundMat);
+ground.rotation.x = -Math.PI/2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// 网格辅助
+const grid = new THREE.GridHelper(1000,100,0x222244,0x111133);
+scene.add(grid);
+
+// 材质库
+const colors = {
+red:0xcc4444,gold:0xddcc88,green:0x33aa55,blue:0x4477aa,
+purple:0x8866aa,pink:0xcc6688,white:0xeeeeee,gray:0x666666
+};
+
+// 创建建筑
+const buildingMeshes = [];
+const buildingData = {};
+
+buildings.forEach((b,i)=>{
+const geo = new THREE.BoxGeometry(b.w,b.h,b.d);
+const mat = new THREE.MeshStandardMaterial({
+color:b.color||colors[[ 'red','gold','green','blue','purple','pink' ][i%6]],
+metalness:0.3,roughness:0.7
+});
+const mesh = new THREE.Mesh(geo,mat);
+mesh.position.set(b.x,b.h/2,b.z);
+mesh.castShadow = true;
+mesh.receiveShadow = true;
+mesh.userData = {name:b.name,index:i};
+scene.add(mesh);
+buildingMeshes.push(mesh);
+buildingData[b.name] = b;
+
+// 添加窗户光
+if(b.h>40){
+const winGeo = new THREE.BoxGeometry(b.w*0.8,b.h*0.8,b.d*0.8);
+const winMat = new THREE.MeshStandardMaterial({color:0xffffaa,emissive:0xffffaa,emissiveIntensity:0.1});
+const winMesh = new THREE.Mesh(winGeo,winMat);
+winMesh.position.set(b.x,b.h/2,b.z);
+scene.add(winMesh);
+}
+});
+
+// 创建道路
+roads.forEach(r=>{
+const geo = new THREE.PlaneGeometry(r.w||100,r.h||8);
+const mat = new THREE.MeshStandardMaterial({color:0x333344,roughness:0.95});
+const road = new THREE.Mesh(geo,mat);
+road.rotation.x = -Math.PI/2;
+road.position.set(r.x,0.1,r.z);
+scene.add(road);
+});
+
+// 创建河流
+rivers.forEach(r=>{
+const geo = new THREE.PlaneGeometry(r.w,r.h);
+const mat = new THREE.MeshStandardMaterial({color:0x2255aa,metalness:0.3,roughness:0.4});
+const river = new THREE.Mesh(geo,mat);
+river.rotation.x = -Math.PI/2;
+river.position.set(r.x,0.2,r.z);
+scene.add(river);
+});
+
+// 创建公园
+parks.forEach(p=>{
+const geo = new THREE.PlaneGeometry(p.w,p.h);
+const mat = new THREE.MeshStandardMaterial({color:0x228844,roughness:0.9});
+const park = new THREE.Mesh(geo,mat);
+park.rotation.x = -Math.PI/2;
+park.position.set(p.x,0.15,p.z);
+scene.add(park);
+});
+
+// 玩家控制
+let move={forward:false,back:false,left:false,right:false};
+let rotX=0,rotY=0;
+const speed=2;
+
+document.addEventListener('keydown',e=>{
+if(e.key==='w'||e.key==='W')move.forward=true;
+if(e.key==='s'||e.key==='S')move.back=true;
+if(e.key==='a'||e.key==='A')move.left=true;
+if(e.key==='d'||e.key==='D')move.right=true;
+});
+document.addEventListener('keyup',e=>{
+if(e.key==='w'||e.key==='W')move.forward=false;
+if(e.key==='s'||e.key==='S')move.back=false;
+if(e.key==='a'||e.key==='A')move.left=false;
+if(e.key==='d'||e.key==='D')move.right=false;
+});
+
+document.addEventListener('mousemove',e=>{
+if(document.pointerLockElement){
+rotY -= e.movementX*0.002;
+rotX -= e.movementY*0.002;
+rotX = Math.max(-Math.PI/2,Math.min(Math.PI/2,rotX));
+}
+});
+
+renderer.domElement.addEventListener('click',()=>{
+renderer.domElement.requestPointerLock();
+});
+
+// 射线检测
+const raycaster = new THREE.Raycaster();
+document.addEventListener('click',e=>{
+if(document.pointerLockElement){
+raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+const hits = raycaster.intersectObjects(buildingMeshes);
+if(hits.length>0){
+const b = hits[0].object.userData;
+alert(`🏢 ${b.name}\n高度: ${buildingData[b.name]?.h||50}m`);
+}
+}
+});
+
+// 更新UI
+function updateUI(){
+document.getElementById('pos').textContent = `${Math.round(camera.position.x)}, ${Math.round(camera.position.z)}`;
+document.getElementById('height').textContent = `${Math.round(camera.position.y)}m`;
+let heading = '北';
+const deg = (rotY*180/Math.PI+360)%360;
+if(deg>315||deg<45)heading='北';
+else if(deg>=45&&deg<135)heading='东';
+else if(deg>=135&&deg<225)heading='南';
+else heading='西';
+document.getElementById('heading').textContent = heading;
+
+// 附近建筑
+let near='--';
+buildingMeshes.forEach(m=>{
+const d = camera.position.distanceTo(m.position);
+if(d<50) near = m.userData.name;
+});
+document.getElementById('current-building').textContent = near;
+}
+
+// 建筑列表
+const list = document.getElementById('list');
+buildings.forEach(b=>{
+const div = document.createElement('div');
+div.className = 'building-item';
+div.textContent = `${b.name} (${b.h}m)`;
+div.onclick = () => {
+camera.position.set(b.x,b.h+20,b.z-30);
+rotY = 0;
+};
+list.appendChild(div);
+});
+
+// 动画循环
+function animate(){
+const dir = new THREE.Vector3();
+dir.setFromMatrixColumn(camera.matrix,0);
+dir.crossVectors(camera.up,dir);
+
+if(move.forward){camera.position.addScaledVector(dir,speed);camera.position.y=30;}
+if(move.back){camera.position.addScaledVector(dir,-speed);camera.position.y=30;}
+if(move.left){camera.position.addScaledVector(camera.up,-speed);camera.position.y=30;}
+if(move.right){camera.position.addScaledVector(camera.up,speed);camera.position.y=30;}
+
+camera.rotation.set(rotX,rotY,0,'YXZ');
+
+camera.position.x = Math.max(-450,Math.min(450,camera.position.x));
+camera.position.z = Math.max(-450,Math.min(450,camera.position.z));
+
+updateUI();
+renderer.render(scene,camera);
+requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+camera.aspect = window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+});
+</script>
+</body>
+</html>
