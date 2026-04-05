@@ -6,101 +6,94 @@
 <title>🏙️ 哈尔滨3D城市</title>
 <style>
 * {margin:0;padding:0;box-sizing:border-box}
-html,body {height:100%;overflow:hidden;background:#000}
-#c {width:100%;height:100%;display:block}
-#ui {position:fixed;top:0;left:0;right:0;padding:12px 20px;background:linear-gradient(180deg,rgba(0,0,0,0.85),transparent);z-index:100}
+body {font-family:'Microsoft YaHei',sans-serif;background:#0a0f14;color:#fff;overflow:hidden}
+#game {position:fixed;inset:0;perspective:800px;background:linear-gradient(180deg,#0a1520,#1a2530)}
+#city {position:absolute;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(60deg) translateZ(-100px)}
+.floor {position:absolute;width:600px;height:600px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0d1520,#152030);border:2px solid #1a3a4a;border-radius:10px}
+.grid {position:absolute;inset:0;background-image:linear-gradient(#1a3a4a 1px,transparent 1px),linear-gradient(90deg,#1a3a4a 1px,transparent 1px);background-size:30px 30px}
+.b {position:absolute;transform-style:preserve-3d}
+.b::before {content:'';position:absolute;bottom:-8px;left:0;right:0;height:8px;background:inherit;filter:brightness(0.5);transform:rotateX(-90deg);transform-origin:top}
+.b::after {content:'';position:absolute;top:0;right:-6px;width:6px;height:100%;background:inherit;filter:brightness(0.6);transform:rotateY(-90deg);transform-origin:left}
+.road {position:absolute;background:#222;height:8px;left:50%;transform:translateX(-50%)}
+.road-v {width:8px;height:400px;top:50%;transform:translateY(-50%)}
+#ui {position:fixed;top:0;left:0;right:0;padding:15px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);z-index:100;display:flex;justify-content:space-between}
 .title {font-size:18px;font-weight:bold;color:#00d4ff}
-.controls {position:fixed;bottom:20px;left:20px;background:rgba(0,0,0,0.8);padding:10px 14px;border-radius:8px;font-size:11px;color:#888}
-.controls k {color:#00d4ff}
+.info {position:fixed;bottom:20px;left:20px;background:rgba(0,0,0,0.7);padding:12px;border-radius:8px;font-size:12px;color:#888;z-index:100}
+.info k {color:#00d4ff}
+#mini {position:fixed;bottom:20px;right:20px;width:120px;height:120px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:8px;z-index:100;overflow:hidden}
+#player {position:absolute;width:10px;height:10px;background:#00ff88;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #00ff88}
 </style>
 </head>
 <body>
-<div id="ui">
-<div class="title">🏙️ 哈尔滨3D城市 - WASD移动 | 鼠标视角 | 点击进入</div>
+<div id="game">
+<div id="city">
+<div class="floor"><div class="grid"></div></div>
 </div>
-<div class="controls">
-<k>WASD</k> 移动 &nbsp; <k>鼠标</k> 视角 &nbsp; <k>Shift</k> 加速
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<div id="ui"><div class="title">🏙️ 哈尔滨3D城市</div></div>
+<div class="info">
+<k>WASD</k> 移动 &nbsp; <k>鼠标</k> 视角<br>
+点击画面锁定鼠标
+</div>
+<div id="mini"><div id="player"></div></div>
+
 <script>
 const buildings = [
-{name:"索菲亚教堂",x:-40,z:-60,h:55,w:30,d:25,color:0xd4c4a8},
-{name:"曼哈顿商厦",x:-20,z:-40,h:85,w:35,d:25,color:0x2a3a4a},
-{name:"金安欧罗巴",x:10,z:-30,h:70,w:30,d:22,color:0x3a2a1a},
-{name:"中央商城",x:-15,z:-55,h:60,w:40,d:30,color:0x1a2a3a},
-{name:"秋林公司",x:50,z:-80,h:75,w:45,d:35,color:0x8a5a4a},
-{name:"秋林国际",x:70,z:-90,h:100,w:38,d:30,color:0x2a3a4a},
-{name:"防洪纪念塔",x:0,z:80,h:30,w:25,d:25,color:0x8a6a5a},
-{name:"群力新区政府",x:-150,z:50,h:40,w:50,d:35,color:0x3a4a5a},
-{name:"哈尔滨银行",x:-180,z:30,h:90,w:35,d:28,color:0x1a3a5a},
-{name:"盛和天下",x:-120,z:70,h:110,w:40,d:32,color:0x2a3a4a},
-{name:"哈尔滨西站",x:220,z:-120,h:50,w:160,d:90,color:0x4a5a6a},
-{name:"万达广场",x:190,z:-150,h:70,w:80,d:60,color:0x8a3a4a},
-{name:"龙塔",x:100,z:-20,h:200,w:25,d:25,color:0xc9a86c},
-{name:"长江大厦",x:80,z:-10,h:90,w:35,d:28,color:0x3a4a5a},
-{name:"华润大厦",x:60,z:-5,h:130,w:42,d:35,color:0x2a3a4a},
-{name:"斯大林公园",x:10,z:130,w:300,h:3,d:60,color:0x2a5a3a},
-{name:"太阳岛",x:-80,z:180,w:350,h:5,d:250,color:0x2a6a3a},
+{x:-40,z:-60,w:30,h:50,c:'#d4c4a8',n:'索菲亚教堂'},
+{x:-20,z:-40,w:35,h:85,c:'#2a3a4a',n:'曼哈顿商厦'},
+{x:10,z:-30,w:30,h:70,c:'#3a2a1a',n:'金安欧罗巴'},
+{x:50,z:-80,w:45,h:75,c:'#8a5a4a',n:'秋林公司'},
+{x:70,z:-90,w:38,h:100,c:'#2a3a4a',n:'秋林国际'},
+{x:100,z:-20,w:25,h:180,c:'#c9a86c',n:'龙塔'},
+{x:-150,z:50,w:50,h:40,c:'#3a4a5a',n:'群力政府'},
+{x:-180,z:30,w:35,h:90,c:'#1a3a5a',n:'哈尔滨银行'},
+{x:220,z:-120,w:160,h:50,c:'#4a5a6a',n:'哈尔滨西站'},
+{x:190,z:-150,w:80,h:70,c:'#8a3a4a',n:'万达广场'},
+{x:80,z:-10,w:35,h:90,c:'#3a4a5a',n:'长江大厦'},
+{x:60,z:-5,w:42,h:130,c:'#2a3a4a',n:'华润大厦'},
+{x:0,z:80,w:25,h:30,c:'#8a6a5a',n:'防洪纪念塔'},
 ];
 
-const roads = [
-{x:0,z:-80,w:400,h:12,name:"中山路"},
-{x:0,z:20,w:400,h:10,name:"友谊路"},
-{x:-40,z:0,w:12,h:400,name:"中央大街"},
-];
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a1520);
-const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,2000);
-camera.position.set(0,100,0);
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-scene.add(new THREE.AmbientLight(0x404060,0.6));
-const sun = new THREE.DirectionalLight(0xffd4a0,1);
-sun.position.set(-200,300,-100);
-scene.add(sun);
-
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),new THREE.MeshStandardMaterial({color:0x1a2030}));
-ground.rotation.x = -Math.PI/2;
-scene.add(ground);
-scene.add(new THREE.GridHelper(1000,50,0x2a3040,0x1a2030));
+const city = document.getElementById('city');
+const mini = document.getElementById('mini');
+const player = document.getElementById('player');
 
 buildings.forEach(b=>{
-const geo = new THREE.BoxGeometry(b.w,b.h,b.d);
-const mat = new THREE.MeshStandardMaterial({color:b.color,metalness:0.2,roughness:0.7});
-const mesh = new THREE.Mesh(geo,mat);
-mesh.position.set(b.x,b.h/2,b.z);
-mesh.castShadow = true;
-scene.add(mesh);
+const el = document.createElement('div');
+el.className = 'b';
+el.style.cssText = `width:${b.w}px;height:${b.h}px;left:${300+b.x-b.w/2}px;top:${300+b.z-b.h/2}px;background:${b.c}`;
+el.title = b.n;
+city.appendChild(el);
 });
 
+const roads = [
+{h:8,w:400,z:0,x:0},{h:400,w:8,z:0,x:0},{h:8,w:300,z:-80,x:0},{h:300,w:8,z:-40,x:0},{h:8,w:250,z:70,x:0},{h:250,w:8,z:100,x:0},{h:8,w:200,z:-120,x:0},{h:200,w:8,z:60,x:0}
+];
 roads.forEach(r=>{
-const road = new THREE.Mesh(new THREE.PlaneGeometry(r.w,r.h),new THREE.MeshStandardMaterial({color:0x2a2a2a}));
-road.rotation.x = -Math.PI/2;
-road.position.set(r.x,0.15,r.z);
-scene.add(road);
+const el = document.createElement('div');
+el.className = r.w>r.h ? 'road' : 'road road-v';
+el.style.cssText = r.w>r.h ? `width:${r.w}px;top:${300+r.z}px` : `height:${r.h}px;left:${300+r.x}px`;
+city.appendChild(el);
 });
 
-let keys={},pitch=0,yaw=0;
+let px=0,pz=0,rot=0;
+let keys={};
 document.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
 document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-document.addEventListener('mousemove',e=>{if(document.pointerLockElement){yaw-=e.movementX*0.002;pitch-=e.movementY*0.002;pitch=Math.max(-1.5,Math.min(1.5,pitch))}});
-renderer.domElement.addEventListener('click',()=>renderer.domElement.requestPointerLock());
+document.addEventListener('mousemove',e=>{if(document.pointerLockElement)rot-=e.movementX*0.005});
+document.addEventListener('click',()=>document.body.requestPointerLock());
 
-function animate(){
-const s=keys.shift?6:3;
-const f=new THREE.Vector3(0,0,-1).applyEuler(new THREE.Euler(0,yaw,0));
-const r=new THREE.Vector3(1,0,0).applyEuler(new THREE.Euler(0,yaw,0));
-if(keys.w)camera.position.addScaledVector(f,s);if(keys.s)camera.position.addScaledVector(f,-s);
-if(keys.a)camera.position.addScaledVector(r,-s);if(keys.d)camera.position.addScaledVector(r,s);
-camera.position.y=Math.max(10,Math.min(300,camera.position.y));
-camera.position.x=Math.max(-400,Math.min(400,camera.position.x));camera.position.z=Math.max(-400,Math.min(400,camera.position.z));
-camera.rotation.set(pitch,yaw,0,'YXZ');
-renderer.render(scene,camera);requestAnimationFrame(animate);
-}animate();
-window.onresize=()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight)};
+function update(){
+const s = keys.shift?4:2;
+if(keys.w){px+=Math.sin(rot)*s;pz+=Math.cos(rot)*s}
+if(keys.s){px-=Math.sin(rot)*s;pz-=Math.cos(rot)*s}
+if(keys.a){px+=Math.cos(rot)*s;pz-=Math.sin(rot)*s}
+if(keys.d){px-=Math.cos(rot)*s;pz+=Math.sin(rot)*s}
+px=Math.max(-250,Math.min(250,px));pz=Math.max(-250,Math.min(250,pz));
+city.style.transform = `rotateX(60deg) translateZ(-100px) rotateY(${rot*180/Math.PI}deg) translateX(${-px}px) translateZ(${-pz}px)`;
+player.style.left = (60+px/5)+'px';player.style.top = (60+pz/5)+'px';
+requestAnimationFrame(update);
+}update();
 </script>
 </body>
 </html>
