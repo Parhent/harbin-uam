@@ -2,110 +2,89 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏙️ 哈尔滨3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🏙️ 哈尔滨3D漫游</title>
 <style>
-* {margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;-webkit-user-select:none}
-html,body {height:100%;overflow:hidden;background:#080c14;touch-action:none}
-#c {position:fixed;inset:0}
-#ui {position:fixed;top:0;left:0;right:0;padding:10px;background:linear-gradient(180deg,rgba(0,0,0,0.85),transparent);z-index:10;font-size:13px;color:#00d4ff;font-weight:bold}
-#j {position:fixed;bottom:20px;left:20px;width:80px;height:80px;background:rgba(255,255,255,0.05);border:2px solid rgba(0,200,255,0.3);border-radius:50%;z-index:10}
-#k {width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#0088aa);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #00d4ff}
-#z {position:fixed;bottom:20px;right:20px;z-index:10;display:flex;flex-direction:column;gap:8px}
-.b {width:38px;height:38px;background:rgba(0,200,255,0.1);border:2px solid #00d4ff;border-radius:8px;color:#00d4ff;font-size:18px;font-weight:bold;display:flex;align-items:center;justify-content:center}
-#m {position:fixed;bottom:115px;right:20px;width:60px;height:60px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:6px;z-index:10;overflow:hidden}
-.p {width:5px;height:5px;background:#00ff88;border-radius:50%;position:absolute;box-shadow:0 0 4px #00ff88}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000;touch-action:none}
+#c{width:100%;height:100%;display:block}
+#ui{position:fixed;top:0;left:0;right:0;padding:15px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);z-index:10;font-size:14px;color:#00d4ff;font-weight:bold;text-align:center}
+#tip{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:10px 20px;border-radius:20px;color:#888;font-size:12px}
+#mini{position:fixed;bottom:20px;right:20px;width:70px;height:70px;background:rgba(0,0,0,0.8);border:2px solid #00d4ff;border-radius:8px}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui">🏙️ 哈尔滨3D - 拖动摇杆移动</div>
-<div id="j"><div id="k"></div></div>
-<div id="z"><div class="b" id="zi">+</div><div class="b" id="zo">-</div></div>
-<div id="m"><div class="p"></div></div>
+<div id="ui">🏙️ 哈尔滨3D - 触摸摇杆移动</div>
+<div id="tip">左下角摇杆移动 | 右下角缩放</div>
+<div id="mini"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-let W,H;function rs(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}rs();window.onresize=rs;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a1520);
+scene.fog=new THREE.Fog(0x0a1520,50,400);
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+camera.position.set(0,2,0);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.AmbientLight(0x404060,0.6));
+const sun=new THREE.DirectionalLight(0xffd4a0,1);
+sun.position.set(50,100,50);
+scene.add(sun);
 
-const cam={x:0,y:0,z:0,rx:0.7,ry:0,rz:0,zoom:1};
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshStandardMaterial({color:0x1a2530}));
+ground.rotation.x=-Math.PI/2;
+scene.add(ground);
+scene.add(new THREE.GridHelper(600,60,0x2a3a4a,0x1a2530));
+
 const buildings=[
-{x:-40,z:-60,w:36,h:55,c:'#d4c4a8'},{x:-22,z:-42,w:40,h:85,c:'#2a3a4a'},{x:8,z:-32,w:34,h:70,c:'#3a2a1a'},{x:48,z:-80,w:48,h:75,c:'#8a5a4a'},{x:66,z:-90,w:44,h:100,c:'#2a3a4a'},{x:178,z:-30,w:120,h:45,c:'#6a5a4a'},{x:0,z:75,w:28,h:28,c:'#8a6a5a'},{x:-150,z:45,w:50,h:40,c:'#3a4a5a'},{x:-180,z:25,w:40,h:90,c:'#1a3a5a'},{x:-120,z:65,w:45,h:110,c:'#2a3a4a'},{x:215,z:-120,w:160,h:50,c:'#4a5a6a'},{x:185,z:-148,w:85,h:70,c:'#8a3a4a'},{x:95,z:-20,w:28,h:200,c:'#c9a86c'},{x:75,z:-10,w:40,h:90,c:'#3a4a5a'},{x:55,z:-5,w:45,h:130,c:'#2a3a4a'},{x:-80,z:175,w:350,h:8,c:'#2a6a3a'},{x:-250,z:-50,w:150,h:45,c:'#3a4a5a'},{x:-280,z:-30,w:42,h:60,c:'#4a5a6a'}];
-const verts=[];
-
-function hex(c){
-const h=c.replace('#','');
-return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];
-}
-
-function project(x,y,z){
-let p=[x-cam.x,y-cam.y,z-cam.z];
-let yz=p[1]*Math.cos(cam.rz)-p[2]*Math.sin(cam.rz);
-let xz=p[1]*Math.sin(cam.rz)+p[2]*Math.cos(cam.rz);
-let xy=p[0]*Math.cos(cam.ry)-xz*Math.sin(cam.ry);
-let zz=p[0]*Math.sin(cam.ry)+xz*Math.cos(cam.ry);
-let tyz=yz*Math.cos(cam.rx)-zz*Math.sin(cam.rx);
-let zyz=yz*Math.sin(cam.rx)+zz*Math.cos(cam.rx);
-if(tyz<10)return null;
-return[W/2+xy*cam.zoom*800/tyz,H/2+yz*cam.zoom*800/tyz,tyz];
-}
-
-function draw(){
-ctx.fillStyle='#080c14';ctx.fillRect(0,0,W,H);
-
-// 地面网格
-for(let i=-15;i<=15;i++){
-let a=project(-300,i*40,0),b=project(300,i*40,0);
-if(a&&b){ctx.strokeStyle='rgba(30,60,90,0.2)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
-let c=project(i*40,0,-300),d=project(i*40,0,300);
-if(c&&d){ctx.beginPath();ctx.moveTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.stroke();}
-}
-
-// 建筑
-const polys=[];
+{x:-40,z:-60,w:30,h:55,d:25,c:0xd4c4a8},{x:-20,z:-40,w:35,h:85,d:25,c:0x2a3a4a},{x:10,z:-30,w:30,h:70,d:22,c:0x3a2a1a},{x:50,z:-80,w:45,h:75,d:35,c:0x8a5a4a},{x:70,z:-90,w:38,h:100,d:30,c:0x2a3a4a},{x:0,z:80,w:25,h:30,d:25,c:0x8a6a5a},{x:-150,z:50,w:50,h:40,d:35,c:0x3a4a5a},{x:-180,z:30,w:35,h:90,d:28,c:0x1a3a5a},{x:-120,z:70,w:40,h:110,d:32,c:0x2a3a4a},{x:100,z:-20,w:25,h:200,d:25,c:0xc9a86c},{x:80,z:-10,w:35,h:90,d:28,c:0x3a4a5a},{x:60,z:-5,w:42,h:130,d:35,c:0x2a3a4a},{x:220,z:-120,w:160,h:50,d:90,c:0x4a5a6a},{x:190,z:-150,w:80,h:70,d:60,c:0x8a3a4a},{x:-80,z:180,w:350,h:8,d:250,c:0x2a6a3a},{x:-250,z:-50,w:150,h:45,d:100,c:0x3a4a5a}
+];
 buildings.forEach(b=>{
-const hw=b.w/2,hh=b.h;
-// 正面
-polys.push({z:project(b.x+hw,b.z,0)?.[2]||0,v:[[b.x-hw,0,b.z],[b.x+hw,0,b.z],[b.x+hw,hh,b.z],[b.x-hw,hh,b.z]],c:b.c,t:'front'});
-// 顶面
-polys.push({z:project(b.x,b.z,b.h+5)?.[2]||0,v:[[b.x-hw,hh,b.z],[b.x+hw,hh,b.z],[b.x,hh,b.z+hw],[b.x,hh,b.z-hw]],c:b.c,t:'top'});
-// 右侧
-polys.push({z:project(b.x+hw,b.z+hw,0)?.[2]||0,v:[[b.x+hw,0,b.z-hw],[b.x+hw,0,b.z+hw],[b.x+hw,hh,b.z+hw],[b.x+hw,hh,b.z-hw]],c:b.c,t:'right'});
+const mesh=new THREE.Mesh(new THREE.BoxGeometry(b.w,b.h,b.d),new THREE.MeshStandardMaterial({color:b.c,metalness:0.2,roughness:0.7}));
+mesh.position.set(b.x,b.h/2,b.z);
+mesh.castShadow=true;
+scene.add(mesh);
 });
-polys.sort((a,b)=>b.z-a.z);
-polys.forEach(p=>{
-const av=p.v.map(v=>project(v[0],v[1],v[2])).filter(v=>v);
-if(av.length<3)return;
-let rgb=hex(p.c);
-if(p.t==='front')rgb=rgb.map(x=>Math.floor(x*0.9));
-if(p.t==='right')rgb=rgb.map(x=>Math.floor(x*0.65));
-if(p.t==='top')rgb=rgb.map(x=>Math.min(255,Math.floor(x*1.15)));
-ctx.fillStyle=`rgb(${rgb.join(',')})`;
-ctx.beginPath();ctx.moveTo(av[0][0],av[0][1]);
-av.slice(1).forEach(v=>ctx.lineTo(v[0],v[1]));ctx.closePath();ctx.fill();
-});
-requestAnimationFrame(draw);
-}draw();
 
-let jx=0,jy=0,t=false;
-document.getElementById('j').addEventListener('touchstart',e=>{t=true;e.preventDefault()});
-document.getElementById('j').addEventListener('touchmove',e=>{
-if(!t)return;
-const g=e.touches[0],r=document.getElementById('j').getBoundingClientRect();
-let dx=g.clientX-r.left-40,dy=g.clientY-r.top-40;
+let px=0,pz=0,py=2,yaw=0;
+const joystick=document.createElement('div');
+joystick.style.cssText='position:fixed;bottom:20px;left:20px;width:80px;height:80px;background:rgba(255,255,255,0.08);border:2px solid rgba(0,200,255,0.35);border-radius:50%;z-index:10';
+const knob=document.createElement('div');
+knob.style.cssText='width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#006688);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)';
+joystick.appendChild(knob);
+document.body.appendChild(joystick);
+
+let jx=0,jy=0,touch=false;
+joystick.addEventListener('touchstart',e=>{touch=true;e.preventDefault()});
+joystick.addEventListener('touchmove',e=>{
+if(!touch)return;
+const t=e.touches[0],r=joystick.getBoundingClientRect();
+let dx=t.clientX-r.left-40,dy=t.clientY-r.top-40;
 const d=Math.min(30,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(dy,dx);
 jx=Math.cos(a)*d/30;jy=Math.sin(a)*d/30;
-document.getElementById('k').style.transform=`translate(calc(-50%+${jx*25}px),calc(-50%+${jy*25}px))`;
+knob.style.transform=`translate(calc(-50%+${jx*25}px),calc(-50%+${jy*25}px))`;
 e.preventDefault();
 });
-document.getElementById('j').addEventListener('touchend',()=>{t=false;jx=0;jy=0;document.getElementById('k').style.transform='translate(-50%,-50%)'});
-document.getElementById('zi').ontouchstart=()=>cam.zoom=Math.min(2.5,cam.zoom+0.15);
-document.getElementById('zo').ontouchstart=()=>cam.zoom=Math.max(0.5,cam.zoom-0.15);
+joystick.addEventListener('touchend',()=>{touch=false;jx=0;jy=0;knob.style.transform='translate(-50%,-50%)'});
 
-setInterval(()=>{
-cam.x+=jx*4;cam.z+=jy*4;
-cam.x=Math.max(-250,Math.min(250,cam.x));cam.z=Math.max(-250,Math.min(250,cam.z));
-document.querySelector('.p').style.left=(50+cam.x/5)+'%';document.querySelector('.p').style.top=(50+cam.z/5)+'%';
-},16);
+const zin=document.createElement('div');
+zin.textContent='+';zin.style.cssText='position:fixed;bottom:20px;right:20px;width:40px;height:40px;background:rgba(0,200,255,0.15);border:2px solid #00d4ff;border-radius:8px;color:#00d4ff;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10';
+const zout=zin.cloneNode();zout.textContent='-';zout.style.bottom='70px';
+document.body.appendChild(zin);document.body.appendChild(zout);
+zin.ontouchstart=()=>camera.zoom=Math.min(2,camera.zoom+0.1);
+zout.ontouchstart=()=>camera.zoom=Math.max(0.5,camera.zoom-0.1);
+
+function animate(){
+px+=jx*0.5;pz+=jy*0.5;
+px=Math.max(-250,Math.min(250,px));pz=Math.max(-250,Math.min(250,pz));
+camera.position.set(px,py,pz);
+camera.rotation.y=yaw;
+renderer.render(scene,camera);
+requestAnimationFrame(animate);
+}animate();
+window.onresize=()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)};
 </script>
 </body>
 </html>
