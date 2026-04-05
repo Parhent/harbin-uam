@@ -2,26 +2,27 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏙️ 哈尔滨3D城市</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏙️ 哈尔滨3D地图</title>
 <style>
-* {margin:0;padding:0;box-sizing:border-box}
-body {font-family:'Microsoft YaHei',sans-serif;background:#0a0f14;color:#fff;overflow:hidden}
-#game {position:fixed;inset:0;perspective:800px;background:linear-gradient(180deg,#0a1520,#1a2530)}
-#city {position:absolute;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(60deg) translateZ(-100px)}
-.floor {position:absolute;width:600px;height:600px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0d1520,#152030);border:2px solid #1a3a4a;border-radius:10px}
-.grid {position:absolute;inset:0;background-image:linear-gradient(#1a3a4a 1px,transparent 1px),linear-gradient(90deg,#1a3a4a 1px,transparent 1px);background-size:30px 30px}
+* {margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;-webkit-user-select:none}
+html,body {height:100%;overflow:hidden;background:#0a0f14;touch-action:none}
+#game {position:fixed;inset:0;perspective:1000px;background:linear-gradient(180deg,#0d1520,#1a2530)}
+#city {position:absolute;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.1s}
+.floor {position:absolute;width:800px;height:800px;left:50%;top:50%;transform:translate(-50%,-50%) rotateX(70deg);background:linear-gradient(180deg,#0d1520,#152030);border:2px solid #1a3a5a;border-radius:12px;box-shadow:0 0 50px rgba(0,150,200,0.2)}
+.grid {position:absolute;inset:0;background-image:linear-gradient(rgba(30,60,90,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(30,60,90,0.5) 1px,transparent 1px);background-size:40px 40px}
 .b {position:absolute;transform-style:preserve-3d}
-.b::before {content:'';position:absolute;bottom:-8px;left:0;right:0;height:8px;background:inherit;filter:brightness(0.5);transform:rotateX(-90deg);transform-origin:top}
-.b::after {content:'';position:absolute;top:0;right:-6px;width:6px;height:100%;background:inherit;filter:brightness(0.6);transform:rotateY(-90deg);transform-origin:left}
-.road {position:absolute;background:#222;height:8px;left:50%;transform:translateX(-50%)}
-.road-v {width:8px;height:400px;top:50%;transform:translateY(-50%)}
-#ui {position:fixed;top:0;left:0;right:0;padding:15px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);z-index:100;display:flex;justify-content:space-between}
-.title {font-size:18px;font-weight:bold;color:#00d4ff}
-.info {position:fixed;bottom:20px;left:20px;background:rgba(0,0,0,0.7);padding:12px;border-radius:8px;font-size:12px;color:#888;z-index:100}
-.info k {color:#00d4ff}
-#mini {position:fixed;bottom:20px;right:20px;width:120px;height:120px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:8px;z-index:100;overflow:hidden}
-#player {position:absolute;width:10px;height:10px;background:#00ff88;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #00ff88}
+.b::before {content:'';position:absolute;bottom:-10px;left:0;right:0;height:10px;background:inherit;filter:brightness(0.4);transform:rotateX(-90deg);transform-origin:top}
+.b::after {content:'';position:absolute;top:0;right:-8px;width:8px;height:100%;background:inherit;filter:brightness(0.5);transform:rotateY(-90deg);transform-origin:left}
+#ui {position:fixed;top:0;left:0;right:0;padding:12px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);z-index:100;display:flex;justify-content:space-between;align-items:center}
+.title {font-size:16px;font-weight:bold;color:#00d4ff}
+.mini {position:fixed;bottom:15px;right:15px;width:100px;height:100px;background:rgba(0,0,0,0.7);border:2px solid #00d4ff;border-radius:8px;z-index:100;overflow:hidden}
+.mini-p {position:absolute;width:8px;height:8px;background:#00ff88;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 8px #00ff88}
+#joystick {position:fixed;bottom:30px;left:30px;width:100px;height:100px;background:rgba(255,255,255,0.1);border:2px solid rgba(0,212,255,0.3);border-radius:50%;z-index:100}
+#joystick-knob {position:absolute;width:40px;height:40px;background:rgba(0,212,255,0.5);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+#zoom-btns {position:fixed;bottom:30px;right:30px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.btn {width:50px;height:50px;background:rgba(0,212,255,0.2);border:2px solid #00d4ff;border-radius:10px;color:#00d4ff;font-size:24px;display:flex;align-items:center;justify-content:center;user-select:none}
+.btn:active {background:rgba(0,212,255,0.5)}
 </style>
 </head>
 <body>
@@ -31,67 +32,126 @@ body {font-family:'Microsoft YaHei',sans-serif;background:#0a0f14;color:#fff;ove
 </div>
 </div>
 <div id="ui"><div class="title">🏙️ 哈尔滨3D城市</div></div>
-<div class="info">
-<k>WASD</k> 移动 &nbsp; <k>鼠标</k> 视角<br>
-点击画面锁定鼠标
+<div class="mini"><div class="mini-p"></div></div>
+<div id="joystick"><div id="joystick-knob"></div></div>
+<div id="zoom-btns">
+<div class="btn" id="zoom-in">+</div>
+<div class="btn" id="zoom-out">-</div>
 </div>
-<div id="mini"><div id="player"></div></div>
 
 <script>
 const buildings = [
-{x:-40,z:-60,w:30,h:50,c:'#d4c4a8',n:'索菲亚教堂'},
-{x:-20,z:-40,w:35,h:85,c:'#2a3a4a',n:'曼哈顿商厦'},
-{x:10,z:-30,w:30,h:70,c:'#3a2a1a',n:'金安欧罗巴'},
-{x:50,z:-80,w:45,h:75,c:'#8a5a4a',n:'秋林公司'},
-{x:70,z:-90,w:38,h:100,c:'#2a3a4a',n:'秋林国际'},
-{x:100,z:-20,w:25,h:180,c:'#c9a86c',n:'龙塔'},
-{x:-150,z:50,w:50,h:40,c:'#3a4a5a',n:'群力政府'},
-{x:-180,z:30,w:35,h:90,c:'#1a3a5a',n:'哈尔滨银行'},
-{x:220,z:-120,w:160,h:50,c:'#4a5a6a',n:'哈尔滨西站'},
-{x:190,z:-150,w:80,h:70,c:'#8a3a4a',n:'万达广场'},
-{x:80,z:-10,w:35,h:90,c:'#3a4a5a',n:'长江大厦'},
-{x:60,z:-5,w:42,h:130,c:'#2a3a4a',n:'华润大厦'},
-{x:0,z:80,w:25,h:30,c:'#8a6a5a',n:'防洪纪念塔'},
+// 道里区
+{x:-40,z:-60,w:35,h:55,c:'#d4c4a8',n:'索菲亚教堂'},
+{x:-20,z:-40,w:40,h:85,c:'#2a3a4a',n:'曼哈顿商厦'},
+{x:10,z:-30,w:35,h:70,c:'#3a2a1a',n:'金安欧罗巴'},
+{x:-30,z:-20,w:25,h:25,c:'#c9a86c',n:'华梅西餐厅'},
+{x:-25,z:-10,w:28,h:35,c:'#b8956c',n:'马迭尔宾馆'},
+{x:-50,z:-55,w:45,h:60,c:'#1a2a3a',n:'中央商城'},
+{x:-35,z:-45,w:30,h:50,c:'#3a4a5a',n:'飘牌商厦'},
+// 南岗区
+{x:50,z:-80,w:50,h:75,c:'#8a5a4a',n:'秋林公司'},
+{x:70,z:-90,w:45,h:100,c:'#2a3a4a',n:'秋林国际'},
+{x:40,z:-100,w:25,h:30,c:'#9a8a7a',n:'革新街教堂'},
+{x:30,z:-65,w:55,h:45,c:'#4a3a2a',n:'工人文化宫'},
+{x:55,z:-55,w:40,h:65,c:'#2a3a4a',n:'新天地'},
+{x:45,z:-45,w:35,h:55,c:'#3a4a5a',n:'金爵万象'},
+// 火车站
+{x:180,z:-30,w:130,h:45,c:'#6a5a4a',n:'哈尔滨站'},
+{x:160,z:-50,w:40,h:70,c:'#4a5a6a',n:'龙门大厦'},
+{x:130,z:-70,w:50,h:35,c:'#5a4a3a',n:'省博物馆'},
+// 江边
+{x:0,z:80,w:30,h:30,c:'#8a6a5a',n:'防洪纪念塔'},
+{x:-20,z:100,w:50,h:15,c:'#5a4a3a',n:'江畔餐厅'},
+{x:30,z:110,w:60,h:10,c:'#3a4a5a',n:'游艇码头'},
+{x:10,z:130,w:350,h:5,c:'#2a5a3a',n:'斯大林公园'},
+{x:-50,z:150,w:450,h:12,c:'#4a4a4a',n:'滨州铁路桥'},
+// 群力
+{x:-150,z:50,w:55,h:40,c:'#3a4a5a',n:'群力政府'},
+{x:-180,z:30,w:40,h:90,c:'#1a3a5a',n:'哈尔滨银行'},
+{x:-120,z:70,w:45,h:110,c:'#2a3a4a',n:'盛和天下'},
+{x:-100,z:40,w:42,h:95,c:'#3a4a5a',n:'外滩首府'},
+{x:-80,z:55,w:40,h:85,c:'#4a3a4a',n:'天合湾'},
+{x:-130,z:20,w:38,h:80,c:'#5a4a3a',n:'凯旋门'},
+// 哈西
+{x:220,z:-120,w:170,h:50,c:'#4a5a6a',n:'哈尔滨西站'},
+{x:190,z:-150,w:90,h:70,c:'#8a3a4a',n:'万达广场'},
+{x:170,z:-130,w:50,h:55,c:'#5a4a3a',n:'华润凯旋门'},
+// 珠江路
+{x:100,z:-20,w:30,h:200,c:'#c9a86c',n:'龙塔'},
+{x:80,z:-10,w:40,h:90,c:'#3a4a5a',n:'长江大厦'},
+{x:120,z:-30,w:50,h:55,c:'#4a5a6a',n:'省电视台'},
+{x:60,z:-5,w:48,h:130,c:'#2a3a4a',n:'华润大厦'},
+// 太阳岛
+{x:-80,z:180,w:380,h:8,c:'#2a6a3a',n:'太阳岛公园'},
+{x:-100,z:160,w:40,h:20,c:'#eeeeee',n:'美术馆'},
+{x:-120,z:170,w:90,h:12,c:'#c9a86c',n:'俄式小镇'},
+// 松北
+{x:-250,z:-50,w:160,h:45,c:'#3a4a5a',n:'科技创新城'},
+{x:-280,z:-30,w:45,h:60,c:'#4a5a6a',n:'大厦1'},
+{x:-260,z:-70,w:50,h:50,c:'#3a4a5a',n:'大厦2'},
+// 更多高层
+{x:40,z:20,w:38,h:100,c:'#3a4a5a',n:'东盛大厦'},
+{x:25,z:5,w:32,h:80,c:'#4a3a4a',n:'烟草大厦'},
+{x:15,z:-15,w:30,h:75,c:'#2a3a4a',n:'联通大厦'},
 ];
 
 const city = document.getElementById('city');
-const mini = document.getElementById('mini');
-const player = document.getElementById('player');
+const joystick = document.getElementById('joystick');
+const knob = document.getElementById('joystick-knob');
+const miniP = document.querySelector('.mini-p');
+
+let px=0, pz=0, rotY=0, scale=1;
+let jx=0, jy=0;
+let touching = false;
 
 buildings.forEach(b=>{
 const el = document.createElement('div');
 el.className = 'b';
-el.style.cssText = `width:${b.w}px;height:${b.h}px;left:${300+b.x-b.w/2}px;top:${300+b.z-b.h/2}px;background:${b.c}`;
+el.style.cssText = `width:${b.w}px;height:${b.h}px;left:${400+b.x-b.w/2}px;top:${400+b.z-b.h/2}px;background:${b.c}`;
 el.title = b.n;
 city.appendChild(el);
 });
 
+// 道路
 const roads = [
-{h:8,w:400,z:0,x:0},{h:400,w:8,z:0,x:0},{h:8,w:300,z:-80,x:0},{h:300,w:8,z:-40,x:0},{h:8,w:250,z:70,x:0},{h:250,w:8,z:100,x:0},{h:8,w:200,z:-120,x:0},{h:200,w:8,z:60,x:0}
+{h:10,w:500,z:0,x:0},{h:500,w:10,z:0,x:0},{h:10,w:400,z:-80,x:0},{h:400,w:10,z:-40,x:0},{h:10,w:350,z:80,x:0},{h:350,w:10,z:100,x:0},{h:10,w:300,z:-120,x:0},{h:300,w:10,z:60,x:0},{h:10,w:250,z:130,x:0},{h:250,w:10,z:-90,x:0}
 ];
 roads.forEach(r=>{
 const el = document.createElement('div');
 el.className = r.w>r.h ? 'road' : 'road road-v';
-el.style.cssText = r.w>r.h ? `width:${r.w}px;top:${300+r.z}px` : `height:${r.h}px;left:${300+r.x}px`;
+el.style.cssText = (r.w>r.h ? `width:${r.w}px;height:${r.h}px;top:${400+r.z}px;left:${400-r.w/2}px;background:#222` : `width:${r.w}px;height:${r.h}px;left:${400+r.x}px;top:${400-r.h/2}px;background:#222`);
 city.appendChild(el);
 });
 
-let px=0,pz=0,rot=0;
-let keys={};
-document.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
-document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-document.addEventListener('mousemove',e=>{if(document.pointerLockElement)rot-=e.movementX*0.005});
-document.addEventListener('click',()=>document.body.requestPointerLock());
+// 摇杆
+joystick.addEventListener('touchstart',e=>{touching=true;e.preventDefault()});
+joystick.addEventListener('touchmove',e=>{
+if(!touching)return;
+const t=e.touches[0];
+const rect=joystick.getBoundingClientRect();
+const cx=rect.left+50, cy=rect.top+50;
+let dx=t.clientX-cx, dy=t.clientY-cy;
+const dist=Math.min(35,Math.sqrt(dx*dx+dy*dy));
+const angle=Math.atan2(dy,dx);
+jx=Math.cos(angle)*dist/35;
+jy=Math.sin(angle)*dist/35;
+knob.style.transform = `translate(calc(-50% + ${jx*30}px), calc(-50% + ${jy*30}px))`;
+e.preventDefault();
+});
+joystick.addEventListener('touchend',()=>{touching=false;jx=0;jy=0;knob.style.transform='translate(-50%,-50%)'});
+
+// 缩放
+document.getElementById('zoom-in').addEventListener('touchstart',()=>{scale=Math.max(0.5,scale-0.1);update()});
+document.getElementById('zoom-out').addEventListener('touchstart',()=>{scale=Math.min(2,scale+0.1);update()});
 
 function update(){
-const s = keys.shift?4:2;
-if(keys.w){px+=Math.sin(rot)*s;pz+=Math.cos(rot)*s}
-if(keys.s){px-=Math.sin(rot)*s;pz-=Math.cos(rot)*s}
-if(keys.a){px+=Math.cos(rot)*s;pz-=Math.sin(rot)*s}
-if(keys.d){px-=Math.cos(rot)*s;pz+=Math.sin(rot)*s}
-px=Math.max(-250,Math.min(250,px));pz=Math.max(-250,Math.min(250,pz));
-city.style.transform = `rotateX(60deg) translateZ(-100px) rotateY(${rot*180/Math.PI}deg) translateX(${-px}px) translateZ(${-pz}px)`;
-player.style.left = (60+px/5)+'px';player.style.top = (60+pz/5)+'px';
+const s = 3;
+px += jx * s;
+pz += jy * s;
+px=Math.max(-300,Math.min(300,px));pz=Math.max(-300,Math.min(300,pz));
+city.style.transform = `rotateX(70deg) scale(${scale}) rotateY(${rotY}deg) translateX(${-px}px) translateZ(${-pz}px)`;
+miniP.style.left = (50+px/6)+'%';miniP.style.top = (50+pz/6)+'%';
 requestAnimationFrame(update);
 }update();
 </script>
